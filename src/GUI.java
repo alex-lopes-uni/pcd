@@ -1,154 +1,137 @@
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileFilter;
-import java.awt.BorderLayout;
-import java.awt.Color;
-
 import javax.swing.*;
-
+import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class GUI {
-	
-	File[] files1;
-	File[] files2;
-	File[] files3;
+    private static final String MAIN_FRAME_TITLE = "IscTorrents";
+    private static final String CONNECTION_FRAME_TITLE = "Ligar a no"; //TODO add accent
+    private static final String DOWNLOAD_FRAME_TITLE = "Download";
+    private static final String SEARCH_LABEL_TEXT = "Texto a procurar: ";
+    private static final String SEARCH_BUTTON_TEXT = "Procurar";
+    private static final String DOWNLOAD_BUTTON_TEXT = "Descarregar";
+    private static final String CONNECTION_BUTTON_TEXT = "Ligar a no"; //TODO add accent
+    private static final String ADDRESS_LABEL_TEXT = "Endereço: ";
+    private static final String ADDRESS_TEXT_FIELD_DEFAULT_VALUE = "localhost";
+    private static final String PORT_LABEL_TEXT = "Porta: ";
+    private static final String PORT_TEXT_FIELD_DEFAULT_VALUE = "8081";
+    private static final String CANCEL_BUTTON_TEXT = "Cancelar";
+    private static final String OK_BUTTON_TEXT = "Ok";
+    private static final int SEARCH_TEXT_FIELD_SIZE = 20;
 
-	public File[]  getPasta(int n) {
-		if (n == 1) 
-			return files1;
-		if (n == 2) 
-			return files2;
-		
-		return files3;
-	}
-	
-	public void lerConteudo() {
-		
-		files1 = new File("NoA").listFiles(new FileFilter(){
-			@Override
-			public boolean accept(File f) {
-				return f.isFile() && f.getName().endsWith(".mp3");
-			}	
-		});
-		
-		for(File f : files1)
-		System.out.println("file 1: " + f);
-		
-		files2 = new File("NoB").listFiles(new FileFilter(){
-			@Override
-			public boolean accept(File f) {
-				return f.isFile() && f.getName().endsWith(".mp3");
-			}	
-		});
-		
-		for(File f : files2)
-			System.out.println("file 2: " + f);
-		
-		files3 = new File("NoC").listFiles(new FileFilter(){
-			@Override
-			public boolean accept(File f) {
-				return f.isFile() && f.getName().endsWith(".mp3");
-			}	
-		});
-		
-		for(File f : files3)
-			System.out.println("file 3: " + f);
-		
-	}
-		
-	
-	
-	
-	public static void novaJanela() {
-		
-		JFrame frame2 = new JFrame("Ligacao");
-		frame2.setLayout(new GridLayout(1, 4));
-		
-		
-		JLabel label2 = new JLabel("Endereço");
-		JTextField mostrador1 = new JTextField();
-		mostrador1.setBackground(Color.WHITE);
-		mostrador1.setEditable(true);
-		
-		JLabel label3 = new JLabel("Porta");
-		JTextField mostrador2 = new JTextField();
-		mostrador2.setBackground(Color.WHITE);
-		mostrador2.setEditable(true);
-		
-		JButton cancelar = new JButton("Cancelar");
-		JButton ok = new JButton("OK");
-		
-		frame2.add(label2);	
-		frame2.add(mostrador1);	
-		frame2.add(label3);	
-		frame2.add(mostrador2);	
-		frame2.add(cancelar);	
-		frame2.add(ok);
-		
-		
-		frame2.pack();
-		frame2.setVisible(true);
-		
-		
-	}
-	
-	public static void main(String[] args) {
-		GUI g = new GUI();
-		g.lerConteudo();
-		
-		File [] file = g.getPasta(2);
-		for(File f : file)
-			System.out.println(f);
-	
-		String [] string = {"Ola", "teste"};
-		
-		JFrame frame= new JFrame("Torrent");
-		frame.setLayout(new BorderLayout());
-		frame.setSize(300, 200);
-		frame.setResizable(true);
-		
-		//criar paineis
-		JPanel panel1= new JPanel(new GridLayout(1, 3));
-		JPanel panel2= new JPanel(new GridLayout(2,1));
-		
-		//criar elementos
-		JLabel label = new JLabel("Texto a procurar");
-		JTextField mostrador = new JTextField();
-		mostrador.setBackground(Color.WHITE);
-		mostrador.setEditable(true);
-		JButton procurar = new JButton("Procurar");
-		
-		JButton descarregar = new JButton("Descarregar");
-		JButton no = new JButton("Ligar a Nó");
-		
-		JList lista = new JList(string);
-		
-		//adicionar elementos
-		frame.add(panel1, BorderLayout.NORTH);
-		panel1.add(label);
-		panel1.add(mostrador);
-		panel1.add(procurar);
-		frame.add(panel2, BorderLayout.EAST);
-		panel2.add(descarregar);
-		panel2.add(no);
-		frame.add(lista);
+    private JFrame masterFrame;
+    private JFrame connectionFrame;
 
-		
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
-		
-		no.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				novaJanela();
-				
-			}
-			
-		});
-	
-		
-	}
-	
+    private JList fileList;
+    private JTextField search;
+    private JTextField address;
+    private JTextField port;
+
+    public GUI() {
+        createMasterFrame();
+        createConnectionFrame();
+    }
+
+    public void startGUI() { openFrame(masterFrame); }
+
+    public JFrame createFrame(String title) {
+        JFrame frame = new JFrame(title);
+        frame.setLocationRelativeTo(null);
+        return frame;
+    }
+
+    public void openFrame(JFrame frame) {
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    public void createMasterFrame() {
+        masterFrame = createFrame(MAIN_FRAME_TITLE);
+        masterFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        masterFrame.setLayout(new BorderLayout());
+        
+        //panel creation
+        //master frame's panels
+        JPanel searchBar = new JPanel(new BorderLayout());
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 1));
+
+        //search panel
+        //master frame search bar
+        JLabel searchLabel = new JLabel(SEARCH_LABEL_TEXT);
+        searchBar.add(searchLabel, BorderLayout.WEST);
+
+        search = new JTextField(SEARCH_TEXT_FIELD_SIZE);
+        searchBar.add(search, BorderLayout.CENTER);
+
+        JButton searchButton = new JButton(SEARCH_BUTTON_TEXT);
+        searchButton.addActionListener(this::searchButtonClicked);
+        searchBar.add(searchButton, BorderLayout.EAST);
+
+        masterFrame.add(searchBar, BorderLayout.NORTH);
+
+        //button panel
+        JButton downloadButton = new JButton(DOWNLOAD_BUTTON_TEXT);
+        downloadButton.addActionListener(this::downloadButtonClicked);
+        buttonPanel.add(downloadButton);
+
+        JButton connectionButton = new JButton(CONNECTION_BUTTON_TEXT);
+        connectionButton.addActionListener(e -> openFrame(connectionFrame));
+        buttonPanel.add(connectionButton);
+
+        masterFrame.add(buttonPanel, BorderLayout.EAST);
+
+        // file list
+        fileList = new JList();
+        masterFrame.add(fileList, BorderLayout.CENTER);
+    }
+
+    public void createConnectionFrame() {
+        connectionFrame = createFrame(CONNECTION_FRAME_TITLE);
+        connectionFrame.setLayout(new FlowLayout());
+
+        // connection address
+        JLabel addressLabel = new JLabel(ADDRESS_LABEL_TEXT);
+        connectionFrame.add(addressLabel);
+
+        address = new JTextField(ADDRESS_TEXT_FIELD_DEFAULT_VALUE);
+        connectionFrame.add(address);
+
+        // connection port
+        JLabel portLabel = new JLabel(PORT_LABEL_TEXT);
+        connectionFrame.add(portLabel);
+
+        port = new JTextField(PORT_TEXT_FIELD_DEFAULT_VALUE);
+        connectionFrame.add(port);
+
+        // connection frame buttons
+        JButton cancelButton = new JButton(CANCEL_BUTTON_TEXT);
+        cancelButton.addActionListener(e -> connectionFrame.dispose());
+        connectionFrame.add(cancelButton);
+
+        JButton okButton = new JButton(OK_BUTTON_TEXT);
+        okButton.addActionListener(this::connectionOkButtonClicked);
+        connectionFrame.add(okButton);
+    }
+
+    public void finishedDownloadDialog(String message) {
+        JOptionPane.showMessageDialog(null, message, "Info", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    //TODO
+    public void searchButtonClicked(ActionEvent e) { System.out.println(search.getText()); }
+
+    //TODO
+    public void downloadButtonClicked(ActionEvent e) {
+        String message = """
+                Download completo.
+                Fornecedor [endereço=/127.0.0.1, porta=8082]:253
+                Fornecedor [endereço=/127.0.0.1, porta=8081]:251
+                Tempo decorrido:8s""";
+        finishedDownloadDialog(message);
+    }
+
+    //TODO
+    public void connectionOkButtonClicked(ActionEvent e) {
+        System.out.println("Endereço: " + address.getText() + " Porta: " + port.getText());
+        connectionFrame.dispose();
+    }
 }
