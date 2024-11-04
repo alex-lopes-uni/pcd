@@ -3,12 +3,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LocalRepositories {
-    private final String PATH;
+    private final String PATH = System.getProperty("user.dir");
     private final String REPOSITORY_STRING_START;
     private Repository[] repositories;
 
-    public LocalRepositories(String path, String repositoryStringStart) {
-        PATH = path;
+    public LocalRepositories(String repositoryStringStart) {
         REPOSITORY_STRING_START = repositoryStringStart;
         setRepositories();
     }
@@ -33,7 +32,7 @@ public class LocalRepositories {
 
         result = projectDirectory.listFiles(f -> f.isDirectory() && f.getName().startsWith(REPOSITORY_STRING_START));
 
-        if (result == null) {
+        if (result == null || result.length == 0) {
             System.out.println("No local repositories found or invalid path");
             return;
         }
