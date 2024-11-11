@@ -131,18 +131,22 @@ public class GUI {
 
     //TODO
     public void botaoDownloadClicado(ActionEvent e) {
-        if (lista.getSelectedValue() == null) {
+        if (lista.getSelectedValuesList() == null) {
             String message = "Nao selecionou nenhum ficheiro"; //TODO ADD ACCENT
             JOptionPane.showMessageDialog(frame, message, "Erro", JOptionPane.ERROR_MESSAGE);
         } else {
-            String message = String.format("""
-                %s
-                Download completo.
-                Fornecedor [endereço=/127.0.0.1, porta=8082]:253
-                Fornecedor [endereço=/127.0.0.1, porta=8081]:251
-                Tempo decorrido:8s
-                """, lista.getSelectedValue());
-            JOptionPane.showMessageDialog(null, message, "Info", JOptionPane.INFORMATION_MESSAGE);
+            List<String> selected = lista.getSelectedValuesList();
+            for (String s : selected) {
+                String message = String.format("""
+                        %s
+                        Download completo.
+                        Fornecedor [endereço=/127.0.0.1, porta=8082]:253
+                        Fornecedor [endereço=/127.0.0.1, porta=8081]:251
+                        Tempo decorrido:8s
+                        """, s);
+                JOptionPane.showMessageDialog(null, message, "Info", JOptionPane.INFORMATION_MESSAGE);
+            }
+
         }
     }
 

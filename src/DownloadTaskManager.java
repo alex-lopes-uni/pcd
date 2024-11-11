@@ -2,11 +2,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileBlockRequestRepository {
+public class DownloadTaskManager {
     private final List<FileBlockRequestMessage> requestBlocks;
     private final List<FileBlockAnswerMessage> answerBlocks;
 
-    public FileBlockRequestRepository(File file) {
+    public DownloadTaskManager(File file) {
         requestBlocks = new ArrayList<>();
         answerBlocks = new ArrayList<>();
         for (int i = 0; i < file.getTotalSpace(); i+= Constants.BLOCK_SIZE) {
