@@ -5,137 +5,130 @@ import java.io.File;
 import java.util.List;
 
 public class GUI {
-    // strings para a GUI
-    private static final String TITULO_JANELA_PRINCIPAL = "IscTorrents";
-    private static final String TITULO_JANELA_CONEXAO = "Ligação";
-    private static final String TEXTO_LABEL_PESQUISA = "Texto a procurar: ";
-    private static final String TEXTO_BOTAO_PESQUISA = "Procurar";
-    private static final String TEXTO_BOTAO_DOWNLOAD = "Descarregar";
-    private static final String TEXTO_BOTAO_CONEXAO = "Ligar a no"; //TODO add accent
-    private static final String TEXTO_LABEL_ENDERECO = "Endereço: ";
-    private static final String VALOR_PADRAO_CAMPO_ENDERECO = "localhost";
-    private static final String TEXTO_LABEL_PORTA = "Porta: ";
-    private static final String VALOR_PADRAO_CAMPO_PORTA = "8081";
-    private static final String TEXTO_BOTAO_CANCELAR = "Cancelar";
-    private static final String TEXTO_BOTAO_OK = "OK";
+    // strings for the GUI
+    private static final String MAIN_WINDOW_TITLE = "IscTorrents";
+    private static final String CONNECTION_WINDOW_TITLE = "Ligação";
+    private static final String SEARCH_LABEL_TEXT = "Texto a procurar: ";
+    private static final String SEARCH_BUTTON_TEXT = "Procurar";
+    private static final String DOWNLOAD_BUTTON_TEXT = "Descarregar";
+    private static final String CONNECTION_BUTTON_TEXT = "Ligar a no"; //TODO add accent
+    private static final String ADDRESS_LABEL_TEXT = "Endereço: ";
+    private static final String DEFAULT_ADDRESS_FIELD_VALUE = "localhost";
+    private static final String PORT_LABEL_TEXT = "Porta: ";
+    private static final String DEFAULT_PORT_FIELD_VALUE = "8081";
+    private static final String CANCEL_BUTTON_TEXT = "Cancelar";
+    private static final String OK_BUTTON_TEXT = "OK";
 
-    //frames
-    private JFrame frame;
-    private JFrame frameConexao;
+    // frames
+    private JFrame mainFrame;
+    private JFrame connectionFrame;
 
-    // lista
-    // para poder ser atualizada precisa de um DefaultListModel a encapsular
-    private JList<String> lista;
-    private DefaultListModel<String> listaModel;
+    // list
+    private JList<String> fileList;
+    private DefaultListModel<String> listModel;
 
-    // campos de texto
-    // estao aqui para posteriormente podermos chamar as variáveis
-    private JTextField pesquisa;
-    private JTextField endereco;
-    private JTextField porta;
+    // text fields
+    private JTextField searchField;
+    private JTextField addressField;
+    private JTextField portField;
 
-    // como o main em boas práticas deve estar noutra classe,
-    // quando se cria uma GUI ele executa a função criarFrame que é a função main que fizeste
-    public GUI() {
-        criarFrame();
+    private final AppNode client;
+
+    public GUI(AppNode client) {
+        this.client = client;
+        createMainFrame();
     }
 
-    // cria a frame de ligar a nos
-    // e chamada quando se carrega no botão de conexão
-    public void criarFrameConexao() {
-        frameConexao = new JFrame(TITULO_JANELA_CONEXAO);
-        frameConexao.setLocationRelativeTo(null); // para aparecer no centro do ecra em vez de no canto
-        frameConexao.setLayout(new GridLayout(1, 4));
-        
-        JLabel labelEndereco = new JLabel(TEXTO_LABEL_ENDERECO);
-        endereco = new JTextField(VALOR_PADRAO_CAMPO_ENDERECO);
+    public void createMainFrame() {
+        mainFrame = new JFrame(MAIN_WINDOW_TITLE);
+        mainFrame.setLocationRelativeTo(null);
+        mainFrame.setLayout(new BorderLayout());
+        mainFrame.setResizable(true);
 
-        JLabel labelPorta = new JLabel(TEXTO_LABEL_PORTA);
-        porta = new JTextField(VALOR_PADRAO_CAMPO_PORTA);
+        // create panels
+        JPanel searchPanel = new JPanel(new GridLayout(1, 3));
+        JPanel buttonsPanel = new JPanel(new GridLayout(2, 1));
 
-        JButton botaoCancelar = new JButton(TEXTO_BOTAO_CANCELAR);
-        botaoCancelar.addActionListener(_ -> frameConexao.dispose()); // quando se carrega no cancelar ele fecha a pagina
-        
-        JButton botaoOk = new JButton(TEXTO_BOTAO_OK);
-        botaoOk.addActionListener(this::botaoOkClicado); // executa a funcao botãoOkClicado
+        // create elements
+        JLabel searchLabel = new JLabel(SEARCH_LABEL_TEXT);
+        searchField = new JTextField();
+        JButton searchButton = new JButton(SEARCH_BUTTON_TEXT);
+        searchButton.addActionListener(this::searchButtonClicked);
 
-        frameConexao.add(labelEndereco);
-        frameConexao.add(endereco);
-        frameConexao.add(labelPorta);
-        frameConexao.add(porta);
-        frameConexao.add(botaoCancelar);
-        frameConexao.add(botaoOk);
-        
-        frameConexao.pack();
-        frameConexao.setVisible(true);
-    }
-    
-    public void criarFrame() {
-        frame = new JFrame(TITULO_JANELA_PRINCIPAL);
-        frame.setLocationRelativeTo(null); // para aparecer no centro do ecra em vez de no canto
-        frame.setLayout(new BorderLayout());
-        // nao e necessario usar o tamanho visto que se usa a função pack()
-        frame.setResizable(true);
+        JButton downloadButton = new JButton(DOWNLOAD_BUTTON_TEXT);
+        downloadButton.addActionListener(this::downloadButtonClicked);
 
-        //criar panels
-        JPanel painelPesquisa= new JPanel(new GridLayout(1, 3));
-        JPanel painelBotoes= new JPanel(new GridLayout(2,1));
+        JButton connectionButton = new JButton(CONNECTION_BUTTON_TEXT);
+        connectionButton.addActionListener(_ -> createConnectionFrame());
 
-        //criar elementos
-        JLabel labelPesquisa = new JLabel(TEXTO_LABEL_PESQUISA);
-        pesquisa = new JTextField();
-        JButton botaoPesquisa = new JButton(TEXTO_BOTAO_PESQUISA);
-        botaoPesquisa.addActionListener(this::botaoPesquisaClicado); // executa a funcao botãoPesquisaClicado
+        // create file list
+        listModel = new DefaultListModel<>();
+        fileList = new JList<>(listModel);
 
-        JButton botaoDownload = new JButton(TEXTO_BOTAO_DOWNLOAD);
-        botaoDownload.addActionListener(this::botaoDownloadClicado); // executa a funcao botãoDownloadClicado
+        // add elements
+        mainFrame.add(searchPanel, BorderLayout.NORTH);
+        searchPanel.add(searchLabel);
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+        mainFrame.add(buttonsPanel, BorderLayout.EAST);
+        buttonsPanel.add(downloadButton);
+        buttonsPanel.add(connectionButton);
+        mainFrame.add(new JScrollPane(fileList), BorderLayout.CENTER);
 
-        JButton botaoConexao = new JButton(TEXTO_BOTAO_CONEXAO);
-        botaoConexao.addActionListener(_ -> criarFrameConexao()); // cria a frame conexão
-
-        // criação da lista
-        listaModel = new DefaultListModel<>();
-        lista = new JList<>(listaModel);
-
-        //adicionar elementos
-        frame.add(painelPesquisa, BorderLayout.NORTH);
-        painelPesquisa.add(labelPesquisa);
-        painelPesquisa.add(pesquisa);
-        painelPesquisa.add(botaoPesquisa);
-        frame.add(painelBotoes, BorderLayout.EAST);
-        painelBotoes.add(botaoDownload);
-        painelBotoes.add(botaoConexao);
-        frame.add(new JScrollPane(lista), BorderLayout.CENTER);
-        
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // nao se pode abrir ja, pois primeiro queremos atualizar a lista com os dados
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    // abre a GUI
-    public void abrirGUI() {
-        frame.pack();
-        frame.setVisible(true);
+    public void createConnectionFrame() {
+        connectionFrame = new JFrame(CONNECTION_WINDOW_TITLE);
+        connectionFrame.setLocationRelativeTo(null);
+        connectionFrame.setLayout(new GridLayout(1, 4));
+
+        JLabel addressLabel = new JLabel(ADDRESS_LABEL_TEXT);
+        addressField = new JTextField(DEFAULT_ADDRESS_FIELD_VALUE);
+
+        JLabel portLabel = new JLabel(PORT_LABEL_TEXT);
+        portField = new JTextField(DEFAULT_PORT_FIELD_VALUE);
+
+        JButton cancelButton = new JButton(CANCEL_BUTTON_TEXT);
+        cancelButton.addActionListener(_ -> connectionFrame.dispose());
+
+        JButton okButton = new JButton(OK_BUTTON_TEXT);
+        okButton.addActionListener(this::okButtonClicked);
+
+        connectionFrame.add(addressLabel);
+        connectionFrame.add(addressField);
+        connectionFrame.add(portLabel);
+        connectionFrame.add(portField);
+        connectionFrame.add(cancelButton);
+        connectionFrame.add(okButton);
+
+        connectionFrame.pack();
+        connectionFrame.setVisible(true);
+    }
+
+    public void openGUI() {
+        mainFrame.pack();
+        mainFrame.setVisible(true);
     }
 
     //TODO
-    public void botaoPesquisaClicado(ActionEvent e) {
-        if (pesquisa.getText() == null || pesquisa.getText().isEmpty()) {
+    public void searchButtonClicked(ActionEvent e) {
+        if (searchField.getText() == null || searchField.getText().isEmpty()) {
             String message = "Escreva algo a procurar";
-            JOptionPane.showMessageDialog(frame, message, "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        System.out.println(pesquisa.getText());
-        pesquisa.setText("");
+        System.out.println(searchField.getText());
+        searchField.setText("");
     }
 
     //TODO
-    public void botaoDownloadClicado(ActionEvent e) {
-        if (lista.getSelectedValuesList() == null) {
+    public void downloadButtonClicked(ActionEvent e) {
+        if (fileList.getSelectedValuesList() == null) {
             String message = "Nao selecionou nenhum ficheiro"; //TODO ADD ACCENT
-            JOptionPane.showMessageDialog(frame, message, "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
         } else {
-            List<String> selected = lista.getSelectedValuesList();
+            List<String> selected = getSelectedFiles();
             for (String s : selected) {
                 String message = String.format("""
                         %s
@@ -146,35 +139,23 @@ public class GUI {
                         """, s);
                 JOptionPane.showMessageDialog(null, message, "Info", JOptionPane.INFORMATION_MESSAGE);
             }
-
         }
     }
 
     //TODO
-    public void botaoOkClicado(ActionEvent e) {
-        System.out.println("Endereço: " + endereco.getText() + " Porta: " + porta.getText());
-        frameConexao.dispose();
+    public void okButtonClicked(ActionEvent e) {
+        int port = Integer.parseInt(portField.getText());
+        String address = addressField.getText();
+        client.connectToNode(port, address);
+        connectionFrame.dispose();
     }
 
-    public JList<String> getLista() {
-        return lista;
+    public List<String> getSelectedFiles() {
+        return fileList.getSelectedValuesList();
     }
 
-    public String getFicheiroEscolhido() {
-        return lista.getSelectedValue();
+    public void setFileList(List<File> files) {
+        listModel.clear();
+        files.forEach(file -> listModel.addElement(file.getName()));
     }
-
-    // dois ‘sets’ lista, pois pode ser atualizada de duas maneiras, com um array de ‘strings’ ou uma lista de ficheiros
-    public void setLista(String[] items) {
-        listaModel.clear();
-        for (String item : items) {
-            listaModel.addElement(item);
-        }
-    }
-
-    public void setLista(List<File> files) {
-        listaModel.clear();
-        files.forEach(file -> listaModel.addElement(file.getName()));
-    }
-    
 }
