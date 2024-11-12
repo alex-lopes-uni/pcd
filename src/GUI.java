@@ -40,7 +40,7 @@ public class GUI {
     }
 
     public void createMainFrame() {
-        mainFrame = new JFrame(MAIN_WINDOW_TITLE);
+        mainFrame = new JFrame(MAIN_WINDOW_TITLE + ": " + client.getPORT());
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setResizable(true);

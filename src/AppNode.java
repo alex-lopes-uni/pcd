@@ -10,13 +10,11 @@ import java.net.InetAddress;
 public class AppNode {
     private final String PATH;
     private List<File> repositoryFiles;
-    public static int PORT;
-    private static String address = "localhost";
+    private final int PORT;
     private ServerSocket ss;
     private Socket connection;
 
-    public AppNode(String folderName, String address, int PORT) {
-        this.address = address;
+    public AppNode(String folderName, int PORT) {
         this.PORT = PORT;
         PATH = System.getProperty("user.dir") + "/"+ folderName;
         System.out.println("PATH: " + PATH);
@@ -48,6 +46,10 @@ public class AppNode {
             System.out.println("No files found");
         }
         repositoryFiles = result;
+    }
+
+    public int getPORT(){
+        return PORT;
     }
 
     public void runServer() {
@@ -88,7 +90,7 @@ public class AppNode {
     }
 
 
-    public class DealWithNode extends Thread {
+    public static class DealWithNode extends Thread {
         private ObjectInputStream in;
         private ObjectOutputStream out;
         private Socket connection;
@@ -108,5 +110,4 @@ public class AppNode {
         }
 
     }
-
 }
