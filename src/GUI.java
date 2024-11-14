@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.util.List;
 
 public class GUI {
@@ -11,7 +10,7 @@ public class GUI {
     private static final String SEARCH_LABEL_TEXT = "Texto a procurar: ";
     private static final String SEARCH_BUTTON_TEXT = "Procurar";
     private static final String DOWNLOAD_BUTTON_TEXT = "Descarregar";
-    private static final String CONNECTION_BUTTON_TEXT = "Ligar a no"; //TODO add accent
+    private static final String CONNECTION_BUTTON_TEXT = "Ligar a nó";
     private static final String ADDRESS_LABEL_TEXT = "Endereço: ";
     private static final String DEFAULT_ADDRESS_FIELD_VALUE = "localhost";
     private static final String PORT_LABEL_TEXT = "Porta: ";
@@ -40,7 +39,7 @@ public class GUI {
     }
 
     public void createMainFrame() {
-        mainFrame = new JFrame(MAIN_WINDOW_TITLE + ": " + client.getPORT());
+        mainFrame = new JFrame(MAIN_WINDOW_TITLE + ": " + client.getPort());
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setResizable(true);
@@ -80,7 +79,7 @@ public class GUI {
 
     public void createConnectionFrame() {
         connectionFrame = new JFrame(CONNECTION_WINDOW_TITLE);
-        connectionFrame.setLocationRelativeTo(null);
+        connectionFrame.setLocationRelativeTo(mainFrame);
         connectionFrame.setLayout(new GridLayout(1, 4));
 
         JLabel addressLabel = new JLabel(ADDRESS_LABEL_TEXT);
@@ -124,8 +123,8 @@ public class GUI {
 
     //TODO
     public void downloadButtonClicked(ActionEvent e) {
-        if (fileList.getSelectedValuesList() == null) {
-            String message = "Nao selecionou nenhum ficheiro"; //TODO ADD ACCENT
+        if (fileList.getSelectedValuesList() == null || fileList.getSelectedValuesList().isEmpty()) {
+            String message = "Não selecionou nenhum ficheiro";
             JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
         } else {
             List<String> selected = getSelectedFiles();
@@ -137,7 +136,7 @@ public class GUI {
                         Fornecedor [endereço=/127.0.0.1, porta=8081]:251
                         Tempo decorrido:8s
                         """, s);
-                JOptionPane.showMessageDialog(null, message, "Info", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(mainFrame, message, "Info", JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
@@ -146,7 +145,19 @@ public class GUI {
     public void okButtonClicked(ActionEvent e) {
         int port = Integer.parseInt(portField.getText());
         String address = addressField.getText();
-        client.connectToNode(port, address);
+        if(port == client.getPort()) {
+            String message = "Não se pode conectar a si próprio";
+            JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String result = client.connectToNode(address, port);
+        if(result.equals("success")) {
+            String message = "Sucesso";
+            JOptionPane.showMessageDialog(mainFrame, message, "Info", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            String message = "Erro: " + result;
+            JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
+        }
         connectionFrame.dispose();
     }
 
@@ -154,8 +165,9 @@ public class GUI {
         return fileList.getSelectedValuesList();
     }
 
-    public void setFileList(List<File> files) {
+    public void setFileList(List<String> list) {
         listModel.clear();
-        files.forEach(file -> listModel.addElement(file.getName()));
+        listModel.addAll(list);
     }
+
 }

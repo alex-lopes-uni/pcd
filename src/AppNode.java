@@ -13,16 +13,18 @@ public class AppNode {
     private final int PORT;
     private ServerSocket ss;
     private Socket connection;
+    private volatile boolean running = true;
 
     public AppNode(String folderName, int PORT) {
         this.PORT = PORT;
         PATH = System.getProperty("user.dir") + "/"+ folderName;
-        System.out.println("PATH: " + PATH);
         setRepositoryFiles();
     }
 
-    public List<File> getRepositoryFiles() {
-        return repositoryFiles;
+    public List<String> getRepositoryFiles() {
+        List<String> result = new ArrayList<>();
+        repositoryFiles.forEach(file -> result.add(file.getName()));
+        return result;
     }
 
     public void setRepositoryFiles() {
@@ -48,7 +50,7 @@ public class AppNode {
         repositoryFiles = result;
     }
 
-    public int getPORT(){
+    public int getPort(){
         return PORT;
     }
 
@@ -58,35 +60,44 @@ public class AppNode {
             System.out.println("no criado no porto " + PORT);
             waitForConnections();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("An error occurred: " + e.getMessage());
         } finally {
             try {
-                if(ss != null)
-                    ss.close();
+                stopServer();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("An error occurred: " + e.getMessage());
             }
         }
     }
 
     private void waitForConnections() throws IOException {
-        while(true) {
-            Socket connection =  ss.accept();
+        while(running) {
+            connection =  ss.accept();
             DealWithNode handler = new DealWithNode(connection);
             handler.start();
-//			System.out.println("Connection to " + connection.getInetAddress().getHostName() + "is established!");
-            System.out.println("Connection is established!");
+			System.out.println("Connection to " + connection.getInetAddress().getHostName() + ":" + connection.getPort() + " is established!");
         }
     }
 
-    public void connectToNode(int connectionPort, String connectionAddress) {
+    public String connectToNode(String connectionAddress, int connectionPort) {
         try {
             connection = new Socket(InetAddress.getByName(connectionAddress), connectionPort);
-            System.out.println("Connection is established!");
+            System.out.println("Connection to " + connectionAddress + ":" + connectionPort + " is established!");
+            return "success";
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("An error occurred: " + e.getMessage());
+            return e.getMessage();
         }
 
+    }
+
+    public void stopServer() throws IOException {
+        running = false;
+        if (connection != null)
+            connection.close();
+        if(ss != null)
+            ss.close();
+        System.out.println("Server stopped");
     }
 
 
@@ -95,7 +106,7 @@ public class AppNode {
         private ObjectOutputStream out;
         private Socket connection;
 
-        public DealWithNode(Socket connection) throws IOException {
+        public DealWithNode(Socket connection) {
             this.connection = connection;
         }
 
@@ -105,7 +116,7 @@ public class AppNode {
                 in = new ObjectInputStream(connection.getInputStream());
                 out = new ObjectOutputStream(connection.getOutputStream());
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("An error occurred: " + e.getMessage());
             }
         }
 
