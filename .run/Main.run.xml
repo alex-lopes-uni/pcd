@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Main" type="CompoundRunConfigurationType">
-    <toRun name="Main 8081" type="Application" />
-    <toRun name="Main 8082" type="Application" />
-    <toRun name="Main 8083" type="Application" />
-    <method v="2" />
-  </configuration>
-</component>
