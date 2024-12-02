@@ -1,3 +1,5 @@
+package app;
+
 import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 
-public class AppNode {
+public class Node {
     private final String PATH;
     private List<File> repositoryFiles;
     private final int PORT;
@@ -15,7 +17,7 @@ public class AppNode {
     private Socket connection;
     private volatile boolean running = true;
 
-    public AppNode(String folderName, int PORT) {
+    public Node(String folderName, int PORT) {
         this.PORT = PORT;
         PATH = System.getProperty("user.dir") + "/"+ folderName;
         setRepositoryFiles();

@@ -1,3 +1,7 @@
+package managers;
+import messages.FileBlockRequestMessage;
+import messages.FileBlockAnswerMessage;
+import utils.Constants;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +34,7 @@ public class DownloadTaskManager {
     }
 
     public File reconstructFile(String filename) {
-        //TODO usar FileBlockAnswerMessage e juntar num so file
+        //TODO usar messages.FileBlockAnswerMessage e juntar num so file
         File result = new File(filename);
         return result;
     }

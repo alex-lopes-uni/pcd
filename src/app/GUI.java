@@ -1,10 +1,12 @@
+package app;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
 public class GUI {
-    // strings for the GUI
+    // strings for the app.GUI
     private static final String MAIN_WINDOW_TITLE = "IscTorrents";
     private static final String CONNECTION_WINDOW_TITLE = "Ligação";
     private static final String SEARCH_LABEL_TEXT = "Texto a procurar: ";
@@ -31,9 +33,9 @@ public class GUI {
     private JTextField addressField;
     private JTextField portField;
 
-    private final AppNode client;
+    private final Node client;
 
-    public GUI(AppNode client) {
+    public GUI(Node client) {
         this.client = client;
         createMainFrame();
     }
