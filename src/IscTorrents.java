@@ -2,6 +2,7 @@ import app.GUI;
 import app.Node;
 
 public class IscTorrents {
+
     public static void main(String[] args) {
         if (args.length != 2) {
             throw new IllegalArgumentException("please input arguments.");
@@ -15,4 +16,5 @@ public class IscTorrents {
         gui.openGUI();
         node.runServer();
     }
+
 }
