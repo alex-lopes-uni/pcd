@@ -1,7 +1,7 @@
 import app.GUI;
 import app.Node;
 
-public class Main {
+public class IscTorrents {
     public static void startProgram(int port, String rep) {
         Node node = new Node(rep, port);
         GUI gui = new GUI(node);
@@ -11,7 +11,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        if ( args.length != 2) {
+        if (args.length != 2) {
             throw new IllegalArgumentException("please input arguments.");
         }
         int port = Integer.parseInt(args[0]);

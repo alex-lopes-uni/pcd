@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="RunIscTorrents" type="CompoundRunConfigurationType">
+        <toRun name="IscTorrents8081" type="Application"/>
+        <toRun name="IscTorrents8082" type="Application"/>
+        <toRun name="IscTorrents8083" type="Application"/>
+        <method v="2"/>
+    </configuration>
+</component>
