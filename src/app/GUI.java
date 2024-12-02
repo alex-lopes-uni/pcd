@@ -79,6 +79,7 @@ public class GUI {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    // creates the frame that makes the connection to other nodes
     public void createConnectionFrame() {
         connectionFrame = new JFrame(CONNECTION_WINDOW_TITLE);
         connectionFrame.setLocationRelativeTo(mainFrame);
@@ -112,18 +113,21 @@ public class GUI {
         mainFrame.setVisible(true);
     }
 
-    //TODO
+    // action to be done when search button is clicked
+    // starts the search process
     public void searchButtonClicked(ActionEvent e) {
         if (searchField.getText() == null || searchField.getText().isEmpty()) {
             String message = "Escreva algo a procurar";
             JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        // TODO SEARCH ACTION
         System.out.println(searchField.getText());
         searchField.setText("");
     }
 
-    //TODO
+    // action to be done when download button is clicked
+    // starts the download process for all selected files
     public void downloadButtonClicked(ActionEvent e) {
         if (fileList.getSelectedValuesList() == null || fileList.getSelectedValuesList().isEmpty()) {
             String message = "Não selecionou nenhum ficheiro";
@@ -131,6 +135,7 @@ public class GUI {
         } else {
             List<String> selected = getSelectedFiles();
             for (String s : selected) {
+                //TODO DOWNLOAD ACTION
                 String message = String.format("""
                         %s
                         Download completo.
@@ -143,17 +148,18 @@ public class GUI {
         }
     }
 
-    //TODO
+    // action to be done when ok button in the connection frame is clicked
+    // creates the connection between the node and the input node
     public void okButtonClicked(ActionEvent e) {
         int port = Integer.parseInt(portField.getText());
         String address = addressField.getText();
-        if(port == client.getPort()) {
+        if (port == client.getPort()) {
             String message = "Não se pode conectar a si próprio";
             JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
         String result = client.connectToNode(address, port);
-        if(result.equals("success")) {
+        if (result.equals("success")) {
             String message = "Sucesso";
             JOptionPane.showMessageDialog(mainFrame, message, "Info", JOptionPane.INFORMATION_MESSAGE);
         } else {

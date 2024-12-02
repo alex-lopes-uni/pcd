@@ -2,6 +2,7 @@ package messages;
 
 import java.net.Inet4Address;
 
+// abstract class to make sure all message data classes have the sender and reciever
 public abstract class Message {
     private final int senderPort;
     private final Inet4Address senderAddress;

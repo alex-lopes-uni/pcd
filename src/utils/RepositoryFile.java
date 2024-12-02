@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+// data class to store a file and it's hash together
 public class RepositoryFile {
     private final File file;
     private final String hash;
@@ -23,6 +24,7 @@ public class RepositoryFile {
         return this.hash;
     }
 
+    //file calculating algorithm
     public String setHash() throws NoSuchAlgorithmException, IOException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         try (FileInputStream stream = new FileInputStream(file)) {
@@ -45,12 +47,14 @@ public class RepositoryFile {
         return result.toString();
     }
 
+    // returns a block from the array
     public byte[] getFileBlock(byte[] array, int offset, int lenght) {
         byte[] res = new byte[lenght];
         if (lenght - offset >= 0) System.arraycopy(array, offset, res, 0, lenght - offset);
         return res;
     }
 
+    // creates the full binary array to separate into blocks by function above to send
     public byte[] getFileBinary() {
         int size = this.hash.length();
         byte[] result = new byte[size / 2];
@@ -61,6 +65,7 @@ public class RepositoryFile {
         return result;
     }
 
+    // to display file name in GUI
     public String getFileName() {
         return this.file.getName();
     }
