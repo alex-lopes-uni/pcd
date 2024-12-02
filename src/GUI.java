@@ -58,7 +58,7 @@ public class GUI {
         downloadButton.addActionListener(this::downloadButtonClicked);
 
         JButton connectionButton = new JButton(CONNECTION_BUTTON_TEXT);
-        connectionButton.addActionListener(_ -> createConnectionFrame());
+        connectionButton.addActionListener(e -> createConnectionFrame());
 
         // create file list
         listModel = new DefaultListModel<>();
@@ -89,7 +89,7 @@ public class GUI {
         portField = new JTextField(DEFAULT_PORT_FIELD_VALUE);
 
         JButton cancelButton = new JButton(CANCEL_BUTTON_TEXT);
-        cancelButton.addActionListener(_ -> connectionFrame.dispose());
+        cancelButton.addActionListener(e -> connectionFrame.dispose());
 
         JButton okButton = new JButton(OK_BUTTON_TEXT);
         okButton.addActionListener(this::okButtonClicked);

@@ -1,9 +1,4 @@
-public class MainNode1 {
-
-    public static void main(String[] args) {
-        startProgram(8081, "rep1");
-    }
-
+public class Main {
     public static void startProgram(int port, String rep) {
         AppNode appNode = new AppNode(rep, port);
         GUI gui = new GUI(appNode);
@@ -11,4 +6,9 @@ public class MainNode1 {
         gui.openGUI();
         appNode.runServer();
     }
+
+    public static void main(String[] args) {
+        startProgram(8081, "rep1");
+    }
+
 }

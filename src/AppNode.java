@@ -57,7 +57,7 @@ public class AppNode {
     public void runServer() {
         try {
             ss = new ServerSocket(PORT);
-            System.out.println("no criado no porto " + PORT);
+            System.out.println("node created in port: " + PORT);
             waitForConnections();
         } catch (IOException e) {
             System.err.println("An error occurred: " + e.getMessage());
