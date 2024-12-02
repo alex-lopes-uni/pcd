@@ -2,22 +2,29 @@ package messages;
 
 import java.net.Inet4Address;
 
-public class FileBlockAnswerMessage extends Message {
+public class FileSearchResult extends Message {
+    private final WordSearchMessage wordSearchMessage;
     private final int hash;
-    private final byte[] data;
+    private final int fileSize;
 
-    public FileBlockAnswerMessage(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, int hash, byte[] data) {
+
+    public FileSearchResult(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, WordSearchMessage wordSearchMessage, int hash, int fileSize) {
         super(senderPort, senderAddress, recieverPort, recieverAddress);
+        this.wordSearchMessage = wordSearchMessage;
         this.hash = hash;
-        this.data = data;
+        this.fileSize = fileSize;
+    }
+
+    public WordSearchMessage getWordSearchMessage() {
+        return wordSearchMessage;
     }
 
     public int getHash() {
         return hash;
     }
 
-    public byte[] getData() {
-        return data;
+    public int getFileSize() {
+        return fileSize;
     }
 
     @Override
@@ -34,8 +41,9 @@ public class FileBlockAnswerMessage extends Message {
                 + "("
                 + "hash="
                 + this.hash
+                + ", fileSize="
+                + this.fileSize
                 + ")"
                 + "]";
     }
-
 }
