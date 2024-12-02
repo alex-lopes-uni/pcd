@@ -1,4 +1,5 @@
-//package managers;
+package managers;
+
 //import messages.FileBlockRequestMessage;
 //import messages.FileBlockAnswerMessage;
 //import utils.Constants;
@@ -6,7 +7,7 @@
 //import java.util.ArrayList;
 //import java.util.List;
 //
-//public class DownloadTaskManager {
+public class DownloadTaskManager {
 //    private final List<FileBlockRequestMessage> requestBlocks;
 //    private final List<FileBlockAnswerMessage> answerBlocks;
 //
@@ -38,4 +39,4 @@
 //        File result = new File(filename);
 //        return result;
 //    }
-//}
+}
