@@ -3,18 +3,18 @@ package messages;
 import java.net.Inet4Address;
 
 public class FileBlockRequestMessage extends Message {
-    private final int hash;
+    private final String hash;
     private final int offset;
     private final int lenght;
 
-    public FileBlockRequestMessage(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, int hash, int offset, int lenght) {
+    public FileBlockRequestMessage(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, String hash, int offset, int lenght) {
         super(senderPort, senderAddress, recieverPort, recieverAddress);
         this.hash = hash;
         this.offset = offset;
         this.lenght = lenght;
     }
 
-    public int getHash() {
+    public String getHash() {
         return hash;
     }
 

@@ -4,11 +4,11 @@ import java.net.Inet4Address;
 
 public class FileSearchResult extends Message {
     private final WordSearchMessage wordSearchMessage;
-    private final int hash;
+    private final String hash;
     private final int fileSize;
 
 
-    public FileSearchResult(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, WordSearchMessage wordSearchMessage, int hash, int fileSize) {
+    public FileSearchResult(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, WordSearchMessage wordSearchMessage, String hash, int fileSize) {
         super(senderPort, senderAddress, recieverPort, recieverAddress);
         this.wordSearchMessage = wordSearchMessage;
         this.hash = hash;
@@ -19,7 +19,7 @@ public class FileSearchResult extends Message {
         return wordSearchMessage;
     }
 
-    public int getHash() {
+    public String getHash() {
         return hash;
     }
 

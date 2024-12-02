@@ -3,16 +3,16 @@ package messages;
 import java.net.Inet4Address;
 
 public class FileBlockAnswerMessage extends Message {
-    private final int hash;
+    private final String hash;
     private final byte[] data;
 
-    public FileBlockAnswerMessage(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, int hash, byte[] data) {
+    public FileBlockAnswerMessage(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, String hash, byte[] data) {
         super(senderPort, senderAddress, recieverPort, recieverAddress);
         this.hash = hash;
         this.data = data;
     }
 
-    public int getHash() {
+    public String getHash() {
         return hash;
     }
 
