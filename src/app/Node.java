@@ -1,5 +1,6 @@
 package app;
 
+import messages.*;
 import utils.RepositoryFile;
 
 import java.io.File;
@@ -20,8 +21,9 @@ public class Node {
     private ServerSocket ss;
     private Socket connection;
     private volatile boolean running = true;
+    private final List<NodeConnectionThread> threads = new ArrayList<>();
 
-    public Node(String folderName, int PORT) throws NoSuchAlgorithmException, IOException {
+    public Node(String folderName, int PORT) {
         this.PORT = PORT;
         PATH = System.getProperty("user.dir") + "/" + folderName;
         setRepositoryFiles();
@@ -35,7 +37,7 @@ public class Node {
         return PORT;
     }
 
-    public void setRepositoryFiles() throws NoSuchAlgorithmException, IOException {
+    public void setRepositoryFiles() {
         File dir = new File(PATH);
         List<RepositoryFile> result = new ArrayList<>();
 
@@ -55,6 +57,7 @@ public class Node {
         } else {
             System.out.println("No files found");
         }
+
         repositoryFiles = result;
     }
 
@@ -66,21 +69,41 @@ public class Node {
         } catch (IOException e) {
             System.err.println("An error occurred: " + e.getMessage());
         } finally {
-            try {
-                stopServer();
-            } catch (IOException e) {
-                System.err.println("An error occurred: " + e.getMessage());
-            }
+            stopServer();
         }
     }
 
-    private void waitForConnections() throws IOException {
-        while(running) {
-            connection =  ss.accept();
-            DealWithNode handler = new DealWithNode(connection);
-            handler.start();
-			System.out.println("Connection to " + connection.getInetAddress().getHostName() + ":" + connection.getPort() + " is established!");
+    public void waitForConnections() {
+        while (running) {
+            try {
+                connection = ss.accept();
+                NodeConnectionThread handler = new NodeConnectionThread(connection);
+                synchronized (threads) {
+                    threads.add(handler);
+                }
+                threads.get(threads.indexOf(handler)).start();
+                System.out.println("Connection to " + connection.getInetAddress().getHostName() + ":" + connection.getPort() + " is established!");
+            } catch (IOException e) {
+                System.err.println("An error occurred: " + e.getMessage());
+            }
+
         }
+    }
+
+    public void stopServer() {
+        running = false;
+        try {
+            for (NodeConnectionThread thread : threads) {
+                thread.interrupt();
+            }
+            if (connection != null)
+                connection.close();
+            if (ss != null)
+                ss.close();
+        } catch (IOException e) {
+            System.err.println("An error occurred: " + e.getMessage());
+        }
+        System.out.println("Server stopped");
     }
 
     public String connectToNode(String connectionAddress, int connectionPort) {
@@ -95,33 +118,162 @@ public class Node {
 
     }
 
-    public void stopServer() throws IOException {
-        running = false;
-        if (connection != null)
-            connection.close();
-        if(ss != null)
-            ss.close();
-        System.out.println("Server stopped");
+    synchronized public void sendMessageToAllConnections(Message message) {
+        for (NodeConnectionThread thread : threads) {
+            thread.sendMessageToConnection(message);
+        }
     }
 
-    public static class DealWithNode extends Thread {
+    synchronized private NodeConnectionThread getConnection(String connectionAddress, int connectionPort) {
+        for (NodeConnectionThread thread : threads) {
+            if (thread.connection.getInetAddress().getHostName().equals(connectionAddress) && thread.connection.getPort() == connectionPort) {
+                return thread;
+            }
+        }
+        return null;
+    }
+
+    public List<RepositoryFile> search(String keyword) {
+        List<RepositoryFile> result = new ArrayList<>();
+        for (NodeConnectionThread thread : threads) {
+            List<RepositoryFile> searchResult = thread.processSearch(keyword);
+            if (searchResult != null) {
+                result.addAll(searchResult);
+            }
+        }
+        return result;
+    }
+
+    // TODO DOWNLOAD FUNCTION
+    public List<String> download(String fileName) {
+        List<String> result = new ArrayList<>();
+        result.add(fileName);
+        result.add("8");
+        result.add("[endereço=127.0.0.1, porta=8082]:253");
+        result.add("[endereço=127.0.0.1, porta=8082]:253");
+        result.add("[endereço=127.0.0.1, porta=8082]:253");
+        return result;
+    }
+
+    private class NodeConnectionThread extends Thread {
         private ObjectInputStream in;
         private ObjectOutputStream out;
         private final Socket connection;
 
-        public DealWithNode(Socket connection) {
+        public NodeConnectionThread(Socket connection) {
             this.connection = connection;
         }
 
         @Override
         public void run() {
             try {
+                getStreams();
+                processMessages();
+            } finally {
+                closeConnection();
+            }
+        }
+
+        private void getStreams() {
+            try {
                 in = new ObjectInputStream(connection.getInputStream());
                 out = new ObjectOutputStream(connection.getOutputStream());
+                System.out.println("Streams are ready");
             } catch (IOException e) {
                 System.err.println("An error occurred: " + e.getMessage());
             }
         }
 
+        private void processMessages() {
+            while (true) {
+                try {
+                    Object object = in.readObject();
+                    switch (object) {
+                        case FileBlockAnswerMessage message:
+                            handleFileBlockAnswerMessage(message);
+                            System.out.println("[received message: " + message + "]");
+                            break;
+                        case FileBlockRequestMessage message:
+                            handleFileBlockRequestMessage(message);
+                            System.out.println("[received message: " + message + "]");
+                            break;
+                        case FileSearchResult message:
+                            handleFileSearchResult(message);
+                            System.out.println("[received message: " + message + "]");
+                            break;
+                        case WordSearchMessage message:
+                            handleWordSearchMessage(message);
+                            System.out.println("[received message: " + message + "]");
+                            break;
+                        case null:
+                        default:
+                            System.out.println("[received null message]");
+                            return;
+                    }
+                } catch (ClassNotFoundException | IOException e) {
+                    System.err.println("An error occurred: " + e.getMessage());
+                }
+            }
+        }
+
+        synchronized private void sendMessageToConnection(Message message) {
+            try {
+                out.writeObject(message);
+                out.flush();
+            } catch (IOException e) {
+                System.err.println("An error occurred: " + e.getMessage());
+            }
+
+        }
+
+        private void closeConnection() {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+                if (connection != null) {
+                    synchronized (threads) {
+                        threads.remove(this);
+                    }
+                    connection.close();
+                }
+
+            } catch (IOException e) {
+                System.err.println("An error occurred: " + e.getMessage());
+            }
+        }
+
+        // TODO
+        private void handleFileBlockAnswerMessage(FileBlockAnswerMessage message) {
+
+        }
+
+        // TODO
+        private void handleFileBlockRequestMessage(FileBlockRequestMessage message) {
+
+        }
+
+        // TODO
+        private void handleFileSearchResult(FileSearchResult message) {
+
+        }
+
+        // TODO
+        private void handleWordSearchMessage(WordSearchMessage message) {
+
+        }
+
+        // TODO SEARCH FUNCTION
+        private List<RepositoryFile> processSearch(String keyword) {
+            return null;
+        }
+
+        // TODO
+        private List<String> processDownload(RepositoryFile file) {
+            return null;
+        }
     }
 }

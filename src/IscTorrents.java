@@ -9,7 +9,7 @@ import java.util.List;
 
 public class IscTorrents {
 
-    public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
+    public static void main(String[] args) {
         if (args.length != 2) {
             throw new IllegalArgumentException("please input arguments.");
         }

@@ -11,7 +11,7 @@ public class RepositoryFile {
     private final File file;
     private final String hash;
 
-    public RepositoryFile(File file) throws NoSuchAlgorithmException, IOException {
+    public RepositoryFile(File file) {
         this.file = file;
         this.hash = setHash();
     }
@@ -25,32 +25,37 @@ public class RepositoryFile {
     }
 
     //file calculating algorithm
-    public String setHash() throws NoSuchAlgorithmException, IOException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        try (FileInputStream stream = new FileInputStream(file)) {
-            byte[] array = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = stream.read(array)) != -1) {
-                md.update(array, 0, bytesRead);
+    public String setHash() {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            try (FileInputStream stream = new FileInputStream(file)) {
+                byte[] array = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = stream.read(array)) != -1) {
+                    md.update(array, 0, bytesRead);
+                }
             }
-        }
-        byte[] hash = md.digest();
+            byte[] hash = md.digest();
 
-        StringBuilder result = new StringBuilder();
-        for (byte b : hash) {
-            String byteHex = Integer.toHexString(0xff & b);
-            if (byteHex.length() == 1) {
-                result.append('0');
+            StringBuilder result = new StringBuilder();
+            for (byte b : hash) {
+                String byteHex = Integer.toHexString(0xff & b);
+                if (byteHex.length() == 1) {
+                    result.append('0');
+                }
+                result.append(byteHex);
             }
-            result.append(byteHex);
+            return result.toString();
+        } catch (IOException | NoSuchAlgorithmException e) {
+            System.err.println("An error occurred: " + e.getMessage());
         }
-        return result.toString();
+        return null;
     }
 
     // returns a block from the array
-    public byte[] getFileBlock(byte[] array, int offset, int lenght) {
-        byte[] res = new byte[lenght];
-        if (lenght - offset >= 0) System.arraycopy(array, offset, res, 0, lenght - offset);
+    public byte[] getFileBlock(byte[] array, int offset, int length) {
+        byte[] res = new byte[length];
+        if (length - offset >= 0) System.arraycopy(array, offset, res, 0, length - offset);
         return res;
     }
 

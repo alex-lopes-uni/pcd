@@ -1,8 +1,11 @@
 package app;
 
+import utils.RepositoryFile;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GUI {
@@ -33,15 +36,15 @@ public class GUI {
     private JTextField addressField;
     private JTextField portField;
 
-    private final Node client;
+    private final Node node;
 
-    public GUI(Node client) {
-        this.client = client;
+    public GUI(Node node) {
+        this.node = node;
         createMainFrame();
     }
 
     public void createMainFrame() {
-        mainFrame = new JFrame(MAIN_WINDOW_TITLE + ": " + client.getPort());
+        mainFrame = new JFrame(MAIN_WINDOW_TITLE + ": " + node.getPort());
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setResizable(true);
@@ -60,7 +63,7 @@ public class GUI {
         downloadButton.addActionListener(this::downloadButtonClicked);
 
         JButton connectionButton = new JButton(CONNECTION_BUTTON_TEXT);
-        connectionButton.addActionListener(e -> createConnectionFrame());
+        connectionButton.addActionListener(_ -> createConnectionFrame());
 
         // create file list
         listModel = new DefaultListModel<>();
@@ -92,7 +95,7 @@ public class GUI {
         portField = new JTextField(DEFAULT_PORT_FIELD_VALUE);
 
         JButton cancelButton = new JButton(CANCEL_BUTTON_TEXT);
-        cancelButton.addActionListener(e -> connectionFrame.dispose());
+        cancelButton.addActionListener(_ -> connectionFrame.dispose());
 
         JButton okButton = new JButton(OK_BUTTON_TEXT);
         okButton.addActionListener(this::okButtonClicked);
@@ -121,9 +124,15 @@ public class GUI {
             JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        // TODO SEARCH ACTION
-        System.out.println(searchField.getText());
-        searchField.setText("");
+        List<RepositoryFile> result = node.search(searchField.getText());
+        if (result.isEmpty()) {
+            String message = "Não foram encontrados resultados";
+            JOptionPane.showMessageDialog(mainFrame, message, "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        List<String> list = new ArrayList<>();
+        result.forEach(file -> list.add(file.getFileName()));
+        setFileList(list);
     }
 
     // action to be done when download button is clicked
@@ -132,19 +141,34 @@ public class GUI {
         if (fileList.getSelectedValuesList() == null || fileList.getSelectedValuesList().isEmpty()) {
             String message = "Não selecionou nenhum ficheiro";
             JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
-        } else {
-            List<String> selected = getSelectedFiles();
-            for (String s : selected) {
-                //TODO DOWNLOAD ACTION
-                String message = String.format("""
-                        %s
-                        Download completo.
-                        Fornecedor [endereço=/127.0.0.1, porta=8082]:253
-                        Fornecedor [endereço=/127.0.0.1, porta=8081]:251
-                        Tempo decorrido:8s
-                        """, s);
-                JOptionPane.showMessageDialog(mainFrame, message, "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        List<String> selected = getSelectedFiles();
+        for (String s : selected) {
+            List<String> temp = new ArrayList<>();
+            node.getRepositoryFiles().forEach(file -> temp.add(file.getFileName()));
+
+            if (temp.contains(s)) {
+                String message = "Ficheiro " + s + " já existe localmente";
+                JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
+                continue;
             }
+
+            List<String> result = node.download(s); // [file name, time, [endereço=127.0.0.1, porta=8082]:253 ....]
+            if (result.isEmpty()) {
+                String message = "Ocorreu um erro ao fazer download de " + s;
+                JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            String fileName = result.get(0);
+            String time = result.get(1);
+            StringBuilder message = new StringBuilder(fileName + "\n" + "Download completo\n");
+            for (int i = 2; i < result.size(); i++) {
+                message.append("Fornecedor ").append(result.get(i)).append("\n");
+            }
+            message.append("Tempo decorrido: ").append(time).append("s\n");
+            JOptionPane.showMessageDialog(mainFrame, message.toString(), "Info", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -153,12 +177,12 @@ public class GUI {
     public void okButtonClicked(ActionEvent e) {
         int port = Integer.parseInt(portField.getText());
         String address = addressField.getText();
-        if (port == client.getPort()) {
+        if (port == node.getPort()) {
             String message = "Não se pode conectar a si próprio";
             JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        String result = client.connectToNode(address, port);
+        String result = node.connectToNode(address, port);
         if (result.equals("success")) {
             String message = "Sucesso";
             JOptionPane.showMessageDialog(mainFrame, message, "Info", JOptionPane.INFORMATION_MESSAGE);
