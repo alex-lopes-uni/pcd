@@ -124,29 +124,24 @@ public class GUI {
             JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        List<RepositoryFile> result = node.search(searchField.getText());
-        if (result.isEmpty()) {
-            String message = "Não foram encontrados resultados";
-            JOptionPane.showMessageDialog(mainFrame, message, "Info", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        List<String> list = new ArrayList<>();
-        result.forEach(file -> list.add(file.getFileName()));
-        setFileList(list);
+        setFileList(new ArrayList<>());
+        node.search(searchField.getText());
     }
 
     // action to be done when download button is clicked
     // starts the download process for all selected files
     public void downloadButtonClicked(ActionEvent e) {
-        if (fileList.getSelectedValuesList() == null || fileList.getSelectedValuesList().isEmpty()) {
+
+        if (getSelectedFiles() == null || getSelectedFiles().isEmpty()) {
             String message = "Não selecionou nenhum ficheiro";
             JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
         List<String> selected = getSelectedFiles();
+        List<String> temp = new ArrayList<>();
+        node.getRepositoryFiles().forEach(file -> temp.add(file.getFileName()));
         for (String s : selected) {
-            List<String> temp = new ArrayList<>();
-            node.getRepositoryFiles().forEach(file -> temp.add(file.getFileName()));
 
             if (temp.contains(s)) {
                 String message = "Ficheiro " + s + " já existe localmente";
@@ -154,21 +149,8 @@ public class GUI {
                 continue;
             }
 
-            List<String> result = node.download(s); // [file name, time, [endereço=127.0.0.1, porta=8082]:253 ....]
-            if (result.isEmpty()) {
-                String message = "Ocorreu um erro ao fazer download de " + s;
-                JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
-                continue;
-            }
+            node.download(s);
 
-            String fileName = result.get(0);
-            String time = result.get(1);
-            StringBuilder message = new StringBuilder(fileName + "\n" + "Download completo\n");
-            for (int i = 2; i < result.size(); i++) {
-                message.append("Fornecedor ").append(result.get(i)).append("\n");
-            }
-            message.append("Tempo decorrido: ").append(time).append("s\n");
-            JOptionPane.showMessageDialog(mainFrame, message.toString(), "Info", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -193,6 +175,22 @@ public class GUI {
         connectionFrame.dispose();
     }
 
+    public void showDownloadInfo(String fileName, int time, List<String> downloadInfo) {
+
+        if (downloadInfo == null || downloadInfo.isEmpty()) {
+            String message = "Ocorreu um erro ao fazer download de " + fileName;
+            JOptionPane.showMessageDialog(mainFrame, message, "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        StringBuilder message = new StringBuilder(fileName + "\n" + "Download completo\n");
+        for (int i = 2; i < downloadInfo.size(); i++) {
+            message.append("Fornecedor: ").append(downloadInfo.get(i)).append("\n");
+        }
+        message.append("Tempo decorrido: ").append(time).append("s\n");
+        JOptionPane.showMessageDialog(mainFrame, message.toString(), "Info", JOptionPane.INFORMATION_MESSAGE);
+
+    }
+
     public List<String> getSelectedFiles() {
         return fileList.getSelectedValuesList();
     }
@@ -200,6 +198,10 @@ public class GUI {
     public void setFileList(List<String> list) {
         listModel.clear();
         listModel.addAll(list);
+    }
+
+    public synchronized void addToFileList(String fileName) {
+        listModel.addElement(fileName);
     }
 
 }

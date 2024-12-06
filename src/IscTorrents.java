@@ -17,9 +17,7 @@ public class IscTorrents {
         String rep = args[1];
 
         Node node = new Node(rep, port);
-        GUI gui = new GUI(node);
 //        testFileList(gui, node.getRepositoryFiles());
-        gui.openGUI();
         node.runServer();
     }
 

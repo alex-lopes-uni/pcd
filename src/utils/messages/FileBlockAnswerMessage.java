@@ -1,8 +1,9 @@
-package messages;
+package utils.messages;
 
+import java.io.Serializable;
 import java.net.Inet4Address;
 
-public class FileBlockAnswerMessage extends Message {
+public class FileBlockAnswerMessage extends Message implements Serializable {
     private final String hash;
     private final byte[] data;
 
@@ -27,9 +28,9 @@ public class FileBlockAnswerMessage extends Message {
                 + ":"
                 + this.getSenderPort()
                 + ", reciever="
-                + this.getRecieverAddress()
+                + this.getReceiverAddress()
                 + ":"
-                + this.getRecieverPort()
+                + this.getReceiverPort()
                 + ", content="
                 + "("
                 + "hash="

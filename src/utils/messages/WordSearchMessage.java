@@ -1,12 +1,13 @@
-package messages;
+package utils.messages;
 
-import java.net.Inet4Address;
+import java.io.Serializable;
+import java.net.InetAddress;
 
-public class WordSearchMessage extends Message {
+public class WordSearchMessage extends Message implements Serializable {
     private final String keyword;
 
-    public WordSearchMessage(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, String keyword) {
-        super(senderPort, senderAddress, recieverPort, recieverAddress);
+    public WordSearchMessage(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress, String keyword) {
+        super(senderPort, senderAddress, receiverPort, receiverAddress);
         this.keyword = keyword;
     }
 
@@ -20,10 +21,10 @@ public class WordSearchMessage extends Message {
                 + this.getSenderAddress()
                 + ":"
                 + this.getSenderPort()
-                + ", reciever="
-                + this.getRecieverAddress()
+                + ", receiver="
+                + this.getReceiverAddress()
                 + ":"
-                + this.getRecieverPort()
+                + this.getReceiverPort()
                 + ", content="
                 + "("
                 + "keyword="

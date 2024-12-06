@@ -1,18 +1,21 @@
-package messages;
+package utils.messages;
 
-import java.net.Inet4Address;
+import java.io.Serializable;
+import java.net.InetAddress;
 
-public class FileSearchResult extends Message {
+public class FileSearchResult extends Message  implements Serializable {
     private final WordSearchMessage wordSearchMessage;
     private final String hash;
     private final int fileSize;
+    private final String fileName;
 
 
-    public FileSearchResult(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, WordSearchMessage wordSearchMessage, String hash, int fileSize) {
-        super(senderPort, senderAddress, recieverPort, recieverAddress);
+    public FileSearchResult(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress, WordSearchMessage wordSearchMessage, String hash, int fileSize, String fileName) {
+        super(senderPort, senderAddress, receiverPort, receiverAddress);
         this.wordSearchMessage = wordSearchMessage;
         this.hash = hash;
         this.fileSize = fileSize;
+        this.fileName = fileName;
     }
 
     public WordSearchMessage getWordSearchMessage() {
@@ -27,22 +30,26 @@ public class FileSearchResult extends Message {
         return fileSize;
     }
 
+    public String getFileName() { return fileName; }
+
     @Override
     public String toString() {
         return "Message: [sender="
                 + this.getSenderAddress()
                 + ":"
                 + this.getSenderPort()
-                + ", reciever="
-                + this.getRecieverAddress()
+                + ", receiver="
+                + this.getReceiverAddress()
                 + ":"
-                + this.getRecieverPort()
+                + this.getReceiverPort()
                 + ", content="
                 + "("
                 + "hash="
                 + this.hash
                 + ", fileSize="
                 + this.fileSize
+                + ", fileName="
+                + this.fileName
                 + ")"
                 + "]";
     }
