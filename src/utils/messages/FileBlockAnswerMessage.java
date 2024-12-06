@@ -7,8 +7,8 @@ public class FileBlockAnswerMessage extends Message implements Serializable {
     private final String hash;
     private final byte[] data;
 
-    public FileBlockAnswerMessage(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, String hash, byte[] data) {
-        super(senderPort, senderAddress, recieverPort, recieverAddress);
+    public FileBlockAnswerMessage(int senderPort, Inet4Address senderAddress, int receiverPort, Inet4Address receiverAddress, String hash, byte[] data) {
+        super(senderPort, senderAddress, receiverPort, receiverAddress);
         this.hash = hash;
         this.data = data;
     }
@@ -27,7 +27,7 @@ public class FileBlockAnswerMessage extends Message implements Serializable {
                 + this.getSenderAddress()
                 + ":"
                 + this.getSenderPort()
-                + ", reciever="
+                + ", receiver="
                 + this.getReceiverAddress()
                 + ":"
                 + this.getReceiverPort()

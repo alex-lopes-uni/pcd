@@ -5,21 +5,9 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GUI {
-    // strings for the app.GUI
-    private static final String MAIN_WINDOW_TITLE = "IscTorrents";
-    private static final String CONNECTION_WINDOW_TITLE = "Ligação";
-    private static final String SEARCH_LABEL_TEXT = "Texto a procurar: ";
-    private static final String SEARCH_BUTTON_TEXT = "Procurar";
-    private static final String DOWNLOAD_BUTTON_TEXT = "Descarregar";
-    private static final String CONNECTION_BUTTON_TEXT = "Ligar a nó";
-    private static final String ADDRESS_LABEL_TEXT = "Endereço: ";
-    private static final String DEFAULT_ADDRESS_FIELD_VALUE = "localhost";
-    private static final String PORT_LABEL_TEXT = "Porta: ";
-    private static final String DEFAULT_PORT_FIELD_VALUE = "8081";
-    private static final String CANCEL_BUTTON_TEXT = "Cancelar";
-    private static final String OK_BUTTON_TEXT = "OK";
+import static utils.Constants.*;
 
+public class GUI {
     // frames
     private JFrame mainFrame;
     private JFrame connectionFrame;

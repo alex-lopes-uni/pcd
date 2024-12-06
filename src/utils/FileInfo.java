@@ -7,6 +7,6 @@ public record FileInfo(String fileName, String fileHash, long fileSize, List<Soc
 
     @Override
     public String toString() {
-        return "FileInfo{fileName='" + fileName + "', fileHash='" + fileHash + "', fileSize=" + fileSize + "}";
+        return "FileInfo: [fileName='" + fileName + "', fileHash='" + fileHash + "', fileSize=" + fileSize + "]";
     }
 }

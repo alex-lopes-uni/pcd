@@ -1,9 +1,6 @@
 import app.GUI;
 import app.Node;
 import utils.RepositoryFile;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
