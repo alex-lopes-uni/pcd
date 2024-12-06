@@ -29,8 +29,8 @@ public class DownloadTaskManager {
     }
 
     public void addBlockRequest(int offset, int size) {
-        FileBlockRequestMessage block = new FileBlockRequestMessage(connection, hash, offset, size);
-        requestBlocks.add(block);
+//        FileBlockRequestMessage block = new FileBlockRequestMessage(connection, hash, offset, size);
+//        requestBlocks.add(block);
     }
 
     public FileBlockRequestMessage getBlockRequest() {

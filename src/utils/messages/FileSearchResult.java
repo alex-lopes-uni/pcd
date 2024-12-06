@@ -1,7 +1,7 @@
 package utils.messages;
 
 import java.io.Serializable;
-import java.net.Socket;
+import java.net.InetAddress;
 
 public class FileSearchResult extends Message  implements Serializable {
     private final WordSearchMessage wordSearchMessage;
@@ -10,12 +10,16 @@ public class FileSearchResult extends Message  implements Serializable {
     private final String fileName;
 
 
-    public FileSearchResult(Socket connection, WordSearchMessage wordSearchMessage, String hash, int fileSize, String fileName) {
-        super(connection);
+    public FileSearchResult(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress, WordSearchMessage wordSearchMessage, String hash, int fileSize, String fileName) {
+        super(senderPort, senderAddress, receiverPort, receiverAddress);
         this.wordSearchMessage = wordSearchMessage;
         this.hash = hash;
         this.fileSize = fileSize;
         this.fileName = fileName;
+    }
+
+    public WordSearchMessage getWordSearchMessage() {
+        return wordSearchMessage;
     }
 
     public String getHash() {
@@ -31,20 +35,20 @@ public class FileSearchResult extends Message  implements Serializable {
     @Override
     public String toString() {
         return "Message: [sender="
-                + this.getConnection().getLocalAddress().getHostAddress()
+                + this.getSenderAddress()
                 + ":"
-                + this.getConnection().getLocalPort()
+                + this.getSenderPort()
                 + ", receiver="
-                + this.getConnection().getInetAddress()
+                + this.getReceiverAddress()
                 + ":"
-                + this.getConnection().getPort()
+                + this.getReceiverPort()
                 + ", content="
                 + "("
                 + "hash="
                 + this.hash
                 + ", fileSize="
                 + this.fileSize
-                + ", filename="
+                + ", fileName="
                 + this.fileName
                 + ")"
                 + "]";

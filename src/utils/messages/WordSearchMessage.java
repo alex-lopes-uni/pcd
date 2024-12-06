@@ -1,13 +1,13 @@
 package utils.messages;
 
 import java.io.Serializable;
-import java.net.Socket;
+import java.net.InetAddress;
 
 public class WordSearchMessage extends Message implements Serializable {
     private final String keyword;
 
-    public WordSearchMessage(Socket connection, String keyword) {
-        super(connection);
+    public WordSearchMessage(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress, String keyword) {
+        super(senderPort, senderAddress, receiverPort, receiverAddress);
         this.keyword = keyword;
     }
 
@@ -18,13 +18,13 @@ public class WordSearchMessage extends Message implements Serializable {
     @Override
     public String toString() {
         return "Message: [sender="
-                + this.getConnection().getLocalAddress().getHostAddress()
+                + this.getSenderAddress()
                 + ":"
-                + this.getConnection().getLocalPort()
+                + this.getSenderPort()
                 + ", receiver="
-                + this.getConnection().getInetAddress()
+                + this.getReceiverAddress()
                 + ":"
-                + this.getConnection().getPort()
+                + this.getReceiverPort()
                 + ", content="
                 + "("
                 + "keyword="

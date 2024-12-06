@@ -240,7 +240,7 @@ public class Node {
         }
 
         private void closeConnection() {
-            CloseConnectionMessage message = new CloseConnectionMessage(connection);
+            CloseConnectionMessage message = new CloseConnectionMessage(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress());
             sendMessageToConnection(message);
             close();
         }
@@ -275,7 +275,7 @@ public class Node {
 
         synchronized private void handleFileSearchResult(FileSearchResult input) {
             for(FileInfo fileInfo : searchInfo) {
-                if(fileInfo.filename().equals(input.getFileName())) {
+                if(fileInfo.fileName().equals(input.getFileName())) {
                     searchInfo.remove(fileInfo);
                     fileInfo.connections().add(connection);
                     searchInfo.add(fileInfo);
@@ -293,7 +293,7 @@ public class Node {
                 String fileName = file.getFileName();
                 int index = fileName.indexOf(input.getKeyword());
                 if (index != -1) {
-                    FileSearchResult message = new FileSearchResult(connection, input, file.getHash(), (int) file.getFile().getTotalSpace(), fileName);
+                    FileSearchResult message = new FileSearchResult(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress(), input, file.getHash(), (int) file.getFile().getTotalSpace(), fileName);
                     sendMessageToConnection(message);
                 }
             }
@@ -301,7 +301,7 @@ public class Node {
         }
 
         synchronized private void processSearch(String keyword) {
-            WordSearchMessage message = new WordSearchMessage(connection, keyword);
+            WordSearchMessage message = new WordSearchMessage(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress(), keyword);
             sendMessageToConnection(message);
         }
 
