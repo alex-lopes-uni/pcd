@@ -2,11 +2,12 @@ package utils.messages;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.net.Socket;
 
 public class NewConnectionRequest extends Message implements Serializable {
 
-    public NewConnectionRequest(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress) {
-        super(senderPort, senderAddress, receiverPort, receiverAddress);
+    public NewConnectionRequest(Socket connection) {
+        super(connection);
     }
 
 }

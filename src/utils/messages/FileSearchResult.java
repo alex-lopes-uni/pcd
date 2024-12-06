@@ -2,6 +2,7 @@ package utils.messages;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.net.Socket;
 
 public class FileSearchResult extends Message  implements Serializable {
     private final WordSearchMessage wordSearchMessage;
@@ -10,8 +11,8 @@ public class FileSearchResult extends Message  implements Serializable {
     private final String fileName;
 
 
-    public FileSearchResult(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress, WordSearchMessage wordSearchMessage, String hash, int fileSize, String fileName) {
-        super(senderPort, senderAddress, receiverPort, receiverAddress);
+    public FileSearchResult(Socket connection, WordSearchMessage wordSearchMessage, String hash, int fileSize, String fileName) {
+        super(connection);
         this.wordSearchMessage = wordSearchMessage;
         this.hash = hash;
         this.fileSize = fileSize;
@@ -35,20 +36,20 @@ public class FileSearchResult extends Message  implements Serializable {
     @Override
     public String toString() {
         return "Message: [sender="
-                + this.getSenderAddress()
+                + this.getConnection().getLocalAddress().getHostAddress()
                 + ":"
-                + this.getSenderPort()
+                + this.getConnection().getLocalPort()
                 + ", receiver="
-                + this.getReceiverAddress()
+                + this.getConnection().getInetAddress()
                 + ":"
-                + this.getReceiverPort()
+                + this.getConnection().getPort()
                 + ", content="
                 + "("
                 + "hash="
                 + this.hash
                 + ", fileSize="
                 + this.fileSize
-                + ", fileName="
+                + ", filename="
                 + this.fileName
                 + ")"
                 + "]";

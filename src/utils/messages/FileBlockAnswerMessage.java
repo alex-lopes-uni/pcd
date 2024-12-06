@@ -1,14 +1,14 @@
 package utils.messages;
 
 import java.io.Serializable;
-import java.net.Inet4Address;
+import java.net.Socket;
 
 public class FileBlockAnswerMessage extends Message implements Serializable {
     private final String hash;
     private final byte[] data;
 
-    public FileBlockAnswerMessage(int senderPort, Inet4Address senderAddress, int recieverPort, Inet4Address recieverAddress, String hash, byte[] data) {
-        super(senderPort, senderAddress, recieverPort, recieverAddress);
+    public FileBlockAnswerMessage(Socket connection, String hash, byte[] data) {
+        super(connection);
         this.hash = hash;
         this.data = data;
     }
@@ -24,13 +24,13 @@ public class FileBlockAnswerMessage extends Message implements Serializable {
     @Override
     public String toString() {
         return "Message: [sender="
-                + this.getSenderAddress()
+                + this.getConnection().getLocalAddress().getHostAddress()
                 + ":"
-                + this.getSenderPort()
-                + ", reciever="
-                + this.getReceiverAddress()
+                + this.getConnection().getLocalPort()
+                + ", receiver="
+                + this.getConnection().getInetAddress()
                 + ":"
-                + this.getReceiverPort()
+                + this.getConnection().getPort()
                 + ", content="
                 + "("
                 + "hash="

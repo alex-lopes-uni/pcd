@@ -1,15 +1,15 @@
 package utils.messages;
 
 import java.io.Serializable;
-import java.net.InetAddress;
+import java.net.Socket;
 
 public class FileBlockRequestMessage extends Message implements Serializable {
     private final String hash;
     private final int offset;
     private final int length;
 
-    public FileBlockRequestMessage(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress, String hash, int offset, int length) {
-        super(senderPort, senderAddress, receiverPort, receiverAddress);
+    public FileBlockRequestMessage(Socket connection, String hash, int offset, int length) {
+        super(connection);
         this.hash = hash;
         this.offset = offset;
         this.length = length;
@@ -30,13 +30,13 @@ public class FileBlockRequestMessage extends Message implements Serializable {
     @Override
     public String toString() {
         return "Message: [sender="
-                + this.getSenderAddress()
+                + this.getConnection().getLocalAddress().getHostAddress()
                 + ":"
-                + this.getSenderPort()
+                + this.getConnection().getLocalPort()
                 + ", receiver="
-                + this.getReceiverAddress()
+                + this.getConnection().getInetAddress()
                 + ":"
-                + this.getReceiverPort()
+                + this.getConnection().getPort()
                 + ", content="
                 + "("
                 + "hash="
