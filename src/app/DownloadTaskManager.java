@@ -2,9 +2,7 @@ package app;
 
 import utils.Constants;
 import utils.FileInfo;
-import utils.RepositoryFile;
 import utils.messages.FileBlockRequestMessage;
-
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;

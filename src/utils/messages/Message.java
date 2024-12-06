@@ -1,7 +1,6 @@
 package utils.messages;
 
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.net.Socket;
 
 // abstract class to make sure all message data classes have the sender and receiver

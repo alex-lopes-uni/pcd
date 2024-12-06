@@ -1,7 +1,6 @@
 package utils.messages;
 
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.net.Socket;
 
 public class FileSearchResult extends Message  implements Serializable {
@@ -17,10 +16,6 @@ public class FileSearchResult extends Message  implements Serializable {
         this.hash = hash;
         this.fileSize = fileSize;
         this.fileName = fileName;
-    }
-
-    public WordSearchMessage getWordSearchMessage() {
-        return wordSearchMessage;
     }
 
     public String getHash() {
