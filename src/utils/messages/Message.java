@@ -5,10 +5,10 @@ import java.net.InetAddress;
 
 // abstract class to make sure all message data classes have the sender and receiver
 public abstract class Message  implements Serializable {
-    private final int senderPort;
-    private final InetAddress senderAddress;
-    private final int receiverPort;
-    private final InetAddress receiverAddress;
+    private int senderPort;
+    private InetAddress senderAddress;
+    private int receiverPort;
+    private InetAddress receiverAddress;
 
     public Message(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress) {
         this.senderPort = senderPort;
@@ -31,6 +31,22 @@ public abstract class Message  implements Serializable {
 
     public InetAddress getReceiverAddress() {
         return receiverAddress;
+    }
+
+    public void setSenderPort(int senderPort) {
+        this.senderPort = senderPort;
+    }
+
+    public void setSenderAddress(InetAddress senderAddress) {
+        this.senderAddress = senderAddress;
+    }
+
+    public void setReceiverPort(int receiverPort) {
+        this.receiverPort = receiverPort;
+    }
+
+    public void setReceiverAddress(InetAddress receiverAddress) {
+        this.receiverAddress = receiverAddress;
     }
 
     @Override

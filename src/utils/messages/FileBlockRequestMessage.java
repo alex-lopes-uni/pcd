@@ -27,6 +27,13 @@ public class FileBlockRequestMessage extends Message implements Serializable {
         return length;
     }
 
+    public void setMessage(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress) {
+        this.setSenderPort(senderPort);
+        this.setSenderAddress(senderAddress);
+        this.setReceiverPort(receiverPort);
+        this.setReceiverAddress(receiverAddress);
+    }
+
     @Override
     public String toString() {
         return "FileBlockRequestMessage: [sender="

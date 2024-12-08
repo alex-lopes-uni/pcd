@@ -1,12 +1,11 @@
 package app;
 
+import utils.ThreadHandler;
 import utils.messages.*;
 import utils.FileInfo;
 import utils.RepositoryFile;
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -132,7 +131,7 @@ public class Node {
         searchInfo.clear();
         for (NodeConnectionThread thread : threads) {
             thread.processSearch(keyword);
-            System.out.println("Searching for \"" + keyword + "\" at " + thread.connection.getInetAddress().getHostName() + ":" + thread.connection.getPort());
+            System.out.println("Searching for \"" + keyword + "\" at " + thread.getConnection().getInetAddress().getHostName() + ":" + thread.getConnection().getPort());
         }
 
     }
@@ -146,7 +145,7 @@ public class Node {
             return;
         }
 
-        DownloadTaskManager downloadTaskManager = new DownloadTaskManager(fileInfo);
+        DownloadTaskManager downloadTaskManager = new DownloadTaskManager(fileInfo, PATH);
         long startTime = System.currentTimeMillis();
         downloadTaskManager.start();
 
@@ -166,38 +165,14 @@ public class Node {
 
     }
 
-    private class NodeConnectionThread extends Thread {
-        private ObjectInputStream in;
-        private ObjectOutputStream out;
-        private final Socket connection;
+    private class NodeConnectionThread extends ThreadHandler {
 
         public NodeConnectionThread(Socket connection) {
-            this.connection = connection;
+            super(connection);
         }
 
         @Override
-        public void run() {
-            try {
-                getStreams();
-                processMessages();
-            } finally {
-                closeConnection();
-            }
-        }
-
-        private void getStreams() {
-            try {
-                System.out.println("Getting Streams...");
-                out = new ObjectOutputStream(connection.getOutputStream());
-                out.flush();
-                in = new ObjectInputStream(connection.getInputStream());
-                System.out.println("Streams are ready!");
-            } catch (IOException e) {
-                System.err.println("An error occurred: " + e.getMessage());
-            }
-        }
-
-        private void processMessages() {
+        protected void processMessages() {
             while (true) {
                 try {
                     Object object = in.readObject();
@@ -224,28 +199,13 @@ public class Node {
                     }
                 } catch (ClassNotFoundException | IOException e) {
                     System.err.println("An error occurred: " + e.getMessage());
-                    break; // Exit the loop on exceptions.
+                    break;
                 }
             }
         }
 
-        synchronized private void sendMessageToConnection(Message message) {
-            try {
-                out.writeObject(message);
-                out.flush();
-            } catch (IOException e) {
-                System.err.println("An error occurred: " + e.getMessage());
-            }
-            System.out.println("[sent message: " + message + "]");
-        }
-
-        private void closeConnection() {
-            CloseConnectionRequest message = new CloseConnectionRequest(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress());
-            sendMessageToConnection(message);
-            close();
-        }
-
-        private void close() {
+        @Override
+        protected void close() {
             try {
                 if (in != null) {
                     in.close();
