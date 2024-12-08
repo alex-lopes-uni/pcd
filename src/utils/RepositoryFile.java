@@ -53,7 +53,8 @@ public class RepositoryFile {
     }
 
     // returns a block from the array
-    public byte[] getFileBlock(byte[] array, int offset, int length) {
+    public byte[] getFileBlock(int offset, int length) {
+        byte[] array = getFileBinary();
         byte[] res = new byte[length];
         if (length - offset >= 0) System.arraycopy(array, offset, res, 0, length - offset);
         return res;

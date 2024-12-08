@@ -7,14 +7,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadTaskManager {
+public class DownloadTaskManager extends Thread {
     private final List<FileBlockRequestMessage> requestBlocks;
-    private final Socket connection;
     private final String hash;
+    private List<String> downloadInfo;
 
 
-    public DownloadTaskManager(Socket connection, FileInfo file) {
-        this.connection = connection;
+    public DownloadTaskManager(FileInfo file) {
         this.hash = file.fileHash();
         requestBlocks = new ArrayList<>();
 
@@ -36,6 +35,10 @@ public class DownloadTaskManager {
     public FileBlockRequestMessage getBlockRequest() {
         if (requestBlocks.isEmpty()) return null;
         return requestBlocks.removeFirst();
+    }
+
+    public List<String> getDownloadInfo() {  // "[endereço=127.0.0.1, porta=8082]:253"
+        return downloadInfo;
     }
 
 }

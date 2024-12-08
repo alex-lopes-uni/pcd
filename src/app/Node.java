@@ -128,21 +128,6 @@ public class Node {
 
     }
 
-    synchronized public void sendMessageToAllConnections(Message message) {
-        for (NodeConnectionThread thread : threads) {
-            thread.sendMessageToConnection(message);
-        }
-    }
-
-    synchronized private NodeConnectionThread getConnection(String connectionAddress, int connectionPort) {
-        for (NodeConnectionThread thread : threads) {
-            if (thread.connection.getInetAddress().getHostName().equals(connectionAddress) && thread.connection.getPort() == connectionPort) {
-                return thread;
-            }
-        }
-        return null;
-    }
-
     public void search(String keyword) {
         searchInfo.clear();
         for (NodeConnectionThread thread : threads) {
@@ -154,12 +139,31 @@ public class Node {
 
     // TODO DOWNLOAD FUNCTION
     public void download(String fileName) {
-        List<String> result = new ArrayList<>();
-        result.add(fileName);
-        result.add("8");
-        result.add("[endereço=127.0.0.1, porta=8082]:253");
-        result.add("[endereço=127.0.0.1, porta=8082]:253");
-        result.add("[endereço=127.0.0.1, porta=8082]:253");
+        FileInfo fileInfo = searchInfo.stream().filter(file -> file.fileName().equals(fileName)).findFirst().orElse(null);
+
+        if (fileInfo == null) {
+            System.err.println("An error occurred: The file info for downloading was not found");
+            return;
+        }
+
+        DownloadTaskManager downloadTaskManager = new DownloadTaskManager(fileInfo);
+        long startTime = System.currentTimeMillis();
+        downloadTaskManager.start();
+
+        try {
+            downloadTaskManager.join();
+        } catch (InterruptedException e) {
+            System.err.println("An error occurred: " + e.getMessage());
+        }
+
+        long endTime = System.currentTimeMillis();
+        setRepositoryFiles();
+
+        long elapsedTime = endTime - startTime;
+        long time = elapsedTime / 1000;
+
+        gui.showDownloadInfo(fileName, time, downloadTaskManager.getDownloadInfo());
+
     }
 
     private class NodeConnectionThread extends Thread {
@@ -198,10 +202,6 @@ public class Node {
                 try {
                     Object object = in.readObject();
                     switch (object) {
-                        case FileBlockAnswerMessage message:
-                            System.out.println("[received message: " + message + "]");
-                            handleFileBlockAnswerMessage(message);
-                            break;
                         case FileBlockRequestMessage message:
                             System.out.println("[received message: " + message + "]");
                             handleFileBlockRequestMessage(message);
@@ -220,7 +220,7 @@ public class Node {
                             System.out.println("[closed connection]");
                         case null:
                         default:
-                            return;
+                            break;
                     }
                 } catch (ClassNotFoundException | IOException e) {
                     System.err.println("An error occurred: " + e.getMessage());
@@ -264,12 +264,23 @@ public class Node {
         }
 
         // TODO
-        synchronized private void handleFileBlockAnswerMessage(FileBlockAnswerMessage input) {
-
-        }
-
-        // TODO
         synchronized private void handleFileBlockRequestMessage(FileBlockRequestMessage input) {
+            RepositoryFile file = repositoryFiles.stream().filter(f -> f.getHash().equals(input.getHash())).findFirst().orElse(null);
+            FileBlockAnswerMessage response;
+
+            if (file == null) {
+                System.err.println("An error occurred: File not found");
+                response = null;
+            } else {
+                response = new FileBlockAnswerMessage(input.getReceiverPort(), input.getReceiverAddress(), input.getSenderPort(), input.getSenderAddress(), input.getHash(), file.getFileBlock(input.getOffset(), input.getLength()));
+            }
+
+            try {
+                out.writeObject(response);
+                out.flush();
+            } catch (IOException e) {
+                System.err.println("An error occurred: " + e.getMessage());
+            }
 
         }
 
@@ -305,9 +316,5 @@ public class Node {
             sendMessageToConnection(message);
         }
 
-        // TODO
-        synchronized private void processDownload(RepositoryFile file) {
-
-        }
     }
 }

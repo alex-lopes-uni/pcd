@@ -160,7 +160,7 @@ public class GUI {
         connectionFrame.dispose();
     }
 
-    public void showDownloadInfo(String fileName, int time, List<String> downloadInfo) {
+    public void showDownloadInfo(String fileName, long time, List<String> downloadInfo) {
 
         if (downloadInfo == null || downloadInfo.isEmpty()) {
             String message = "Ocorreu um erro ao fazer download de " + fileName;
