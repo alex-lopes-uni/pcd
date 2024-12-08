@@ -17,7 +17,7 @@ public class WordSearchMessage extends Message implements Serializable {
 
     @Override
     public String toString() {
-        return "Message: [sender="
+        return "WordSearchMessage: [sender="
                 + this.getSenderAddress()
                 + ":"
                 + this.getSenderPort()

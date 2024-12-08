@@ -18,6 +18,10 @@ public class FileSearchResult extends Message  implements Serializable {
         this.fileName = fileName;
     }
 
+    public WordSearchMessage getWordSearchMessage() {
+        return wordSearchMessage;
+    }
+
     public String getHash() {
         return hash;
     }
@@ -30,7 +34,7 @@ public class FileSearchResult extends Message  implements Serializable {
 
     @Override
     public String toString() {
-        return "Message: [sender="
+        return "FileSearchResult Message: [sender="
                 + this.getSenderAddress()
                 + ":"
                 + this.getSenderPort()

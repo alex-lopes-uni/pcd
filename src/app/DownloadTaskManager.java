@@ -3,7 +3,6 @@ package app;
 import utils.Constants;
 import utils.FileInfo;
 import utils.messages.FileBlockRequestMessage;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class DownloadTaskManager extends Thread {
         return requestBlocks.removeFirst();
     }
 
-    public List<String> getDownloadInfo() {  // "[endereço=127.0.0.1, porta=8082]:253"
+    public List<String> getDownloadInfo() {  // "[endereço=127.0.0.1, porta=8082] : 253"
         return downloadInfo;
     }
 

@@ -214,7 +214,7 @@ public class Node {
                             System.out.println("[received message: " + message + "]");
                             handleWordSearchMessage(message);
                             break;
-                        case CloseConnectionMessage message:
+                        case CloseConnectionRequest message:
                             System.out.println("[received message: " + message + "]");
                             close();
                             System.out.println("[closed connection]");
@@ -240,7 +240,7 @@ public class Node {
         }
 
         private void closeConnection() {
-            CloseConnectionMessage message = new CloseConnectionMessage(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress());
+            CloseConnectionRequest message = new CloseConnectionRequest(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress());
             sendMessageToConnection(message);
             close();
         }
@@ -297,6 +297,7 @@ public class Node {
             connections.add(connection);
             searchInfo.add(new FileInfo(input.getFileName(), input.getHash(), input.getFileSize(), connections));
             SwingUtilities.invokeLater(() -> gui.addToFileList(input.getFileName()));
+            System.out.println("Completed search query: " + input.getWordSearchMessage());
         }
 
         synchronized private void handleWordSearchMessage(WordSearchMessage input) {

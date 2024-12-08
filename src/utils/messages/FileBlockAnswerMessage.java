@@ -23,7 +23,7 @@ public class FileBlockAnswerMessage extends Message implements Serializable {
 
     @Override
     public String toString() {
-        return "Message: [sender="
+        return "FileBlockAnswerMessage: [sender="
                 + this.getSenderAddress()
                 + ":"
                 + this.getSenderPort()
