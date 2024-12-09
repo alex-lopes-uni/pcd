@@ -99,7 +99,7 @@ public class DownloadTaskManager extends Thread {
         }
 
         try {
-            Files.write(Paths.get(PATH), fileBytes);
+            Files.write(Paths.get(PATH + "\\" + fileInfo.fileName()), fileBytes);
         } catch (IOException e) {
             System.err.println(this.getClass() + ": [" + "writeFileInDirectory()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
             downloadInfo.clear();

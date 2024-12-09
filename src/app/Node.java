@@ -29,7 +29,7 @@ public class Node {
 
     public Node(String folderName, int PORT) {
         this.PORT = PORT;
-        PATH = System.getProperty("user.dir") + "/" + folderName;
+        PATH = System.getProperty("user.dir") + "\\" + folderName;
         setRepositoryFiles();
         gui = new GUI(this);
     }
