@@ -29,9 +29,9 @@ public class DownloadTaskManager extends Thread {
     public void createFileRequestBlocks() {
         requestBlocks = new ArrayList<>();
 
-        for (long i = 0; i < this.fileInfo.fileSize(); i+= Constants.BLOCK_SIZE) {
+        for (int i = 0; i < this.fileInfo.fileSize(); i+= Constants.BLOCK_SIZE) {
             if (i + Constants.BLOCK_SIZE > this.fileInfo.fileSize()) {
-                int size = (int) (this.fileInfo.fileSize() - i);
+                int size = this.fileInfo.fileSize() - i;
                 addBlockRequest(i , size);
                 break;
             }
@@ -39,7 +39,7 @@ public class DownloadTaskManager extends Thread {
         }
     }
 
-    public void addBlockRequest(long offset, int size) {
+    public void addBlockRequest(int offset, int size) {
         FileBlockRequestMessage block = new FileBlockRequestMessage(0, null, 0, null, fileInfo.fileHash(), offset, size);
         requestBlocks.add(block);
     }
@@ -51,8 +51,8 @@ public class DownloadTaskManager extends Thread {
         return block;
     }
 
-    public void addDownloadInfo(String address, int port, int length) {
-        downloadInfo.add("[endereço=" + address + ", porta=" + port + "] : " + length);
+    public void addDownloadInfo(String address, int port, long time) {
+        downloadInfo.add("[endereço=" + address + ", porta=" + port + "] : " + time);
     }
 
     public List<String> getDownloadInfo() {
@@ -82,7 +82,7 @@ public class DownloadTaskManager extends Thread {
             try {
                 thread.join();
             } catch (InterruptedException e) {
-                System.out.println("An error occurred: " + e.getMessage());
+                System.err.println("Make requests: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
             }
         }
 
@@ -126,7 +126,7 @@ public class DownloadTaskManager extends Thread {
 
                     FileBlockAnswerMessage answer = (FileBlockAnswerMessage) nodeConnectionThread.getIn().readObject();
                     if (answer == null) {
-                        System.out.println("An error occurred while reading the answer from the server" );
+                        System.err.println("An error occurred: FileBlockAnswerMessage is null" );
                         return;
                     }
 

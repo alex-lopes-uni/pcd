@@ -3,6 +3,7 @@ package utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -10,18 +11,12 @@ import java.security.NoSuchAlgorithmException;
 public class RepositoryFile {
     private final File file;
     private final String hash;
+    private final int size;
 
     public RepositoryFile(File file) {
         this.file = file;
         this.hash = setHash();
-    }
-
-    public File getFile() {
-        return this.file;
-    }
-
-    public String getHash() {
-        return this.hash;
+        this.size = getFileBinary().length;
     }
 
     //file calculating algorithm
@@ -53,22 +48,33 @@ public class RepositoryFile {
     }
 
     // returns a block from the array
-    public byte[] getFileBlock(long offset, int length) {
+    public byte[] getFileBlock(int offset, int length) {
         byte[] array = getFileBinary();
         byte[] res = new byte[length];
-//        if (length - offset >= 0) System.arraycopy(array, offset, res, 0, length - offset);
+        if (length - offset >= 0) System.arraycopy(array, offset, res, 0, length - offset);
         return res;
     }
 
     // creates the full binary array to separate into blocks by function above to send
     public byte[] getFileBinary() {
-        int size = this.hash.length();
-        byte[] result = new byte[size / 2];
-        for (int i = 0; i < size; i += 2) {
-            result[i / 2] = (byte) ((Character.digit(this.hash.charAt(i), 16) << 4)
-                    + Character.digit(this.hash.charAt(i + 1), 16));
+        try {
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            System.err.println("Get File Binary: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
+            return null;
         }
-        return result;
+    }
+
+    public File getFile() {
+        return this.file;
+    }
+
+    public int getSize() {
+        return this.size;
+    }
+
+    public String getHash() {
+        return this.hash;
     }
 
     // to display file name in GUI

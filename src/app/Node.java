@@ -46,7 +46,7 @@ public class Node {
         List<RepositoryFile> result = new ArrayList<>();
 
         if (!dir.exists() || !dir.isDirectory()) {
-            System.out.println("Invalid main directory path");
+            System.err.println("An error occurred: Invalid main directory path");
             return;
         }
 
@@ -59,7 +59,7 @@ public class Node {
                 }
             }
         } else {
-            System.out.println("No files found");
+            System.err.println("An error occurred: No files found");
         }
 
         repositoryFiles = result;
@@ -69,7 +69,7 @@ public class Node {
         gui.openGUI();
         try {
             ss = new ServerSocket(PORT);
-            System.out.println("node created in port: " + PORT);
+            System.out.println("[node created in port: " + PORT + "]");
             waitForConnections();
         } catch (IOException e) {
             System.err.println("Run Server: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
@@ -87,7 +87,7 @@ public class Node {
                     threads.add(handler);
                 }
                 threads.get(threads.indexOf(handler)).start();
-                System.out.println("Connection to " + connection.getInetAddress().getHostName() + ":" + connection.getPort() + " is established!");
+                System.out.println("[connection established: " + connection.getInetAddress().getHostName() + ":" + connection.getPort() + "]");
             } catch (IOException e) {
                 System.err.println("Wait for nodeConnectionThreads: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
             }
@@ -108,7 +108,7 @@ public class Node {
         } catch (IOException e) {
             System.err.println("Stop server: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
         }
-        System.out.println("Server stopped");
+        System.out.println("[server stopped]");
     }
 
     public String connectToNode(String connectionAddress, int connectionPort) {
@@ -119,7 +119,7 @@ public class Node {
                 threads.add(handler);
             }
             threads.get(threads.indexOf(handler)).start();
-            System.out.println("Connection to " + connectionAddress + ":" + connectionPort + " is established!");
+            System.out.println("[connection established: " + connectionAddress + ":" + connectionPort + "]");
             return "success";
         } catch (IOException e) {
             System.err.println("Connect to node: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
@@ -141,7 +141,6 @@ public class Node {
         searchInfo.clear();
         for (NodeConnectionThread thread : threads) {
             thread.processSearch(keyword);
-            System.out.println("Searching for \"" + keyword + "\" at " + thread.getConnection().getInetAddress().getHostName() + ":" + thread.getConnection().getPort());
         }
 
     }
@@ -191,11 +190,10 @@ public class Node {
 
         private void getStreams() {
             try {
-                System.out.println("Getting Streams...");
                 out = new ObjectOutputStream(connection.getOutputStream());
                 out.flush();
                 in = new ObjectInputStream(connection.getInputStream());
-                System.out.println("Streams are ready!");
+                System.out.println("[streams successfully created]");
             } catch (IOException e) {
                 System.err.println("Get Streams: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
             }
@@ -205,23 +203,19 @@ public class Node {
             while (true) {
                 try {
                     Object object = in.readObject();
+                    System.out.println("[received: " + object + "]");
                     switch (object) {
                         case FileBlockRequestMessage message:
-                            System.out.println("[received message: " + message + "]");
                             handleFileBlockRequestMessage(message);
                             break;
                         case FileSearchResult message:
-                            System.out.println("[received message: " + message + "]");
                             handleFileSearchResult(message);
                             break;
                         case WordSearchMessage message:
-                            System.out.println("[received message: " + message + "]");
                             handleWordSearchMessage(message);
                             break;
                         case CloseConnectionRequest message:
-                            System.out.println("[received message: " + message + "]");
                             close();
-                            System.out.println("[closed connection]");
                             return;
                         default:
                     }
@@ -243,7 +237,7 @@ public class Node {
             close();
         }
 
-        private void close() {
+        synchronized private void close() {
             try {
                 if (in != null) in.close();
                 if (out != null) out.close();
@@ -252,7 +246,9 @@ public class Node {
             } catch (IOException e) {
                 System.err.println("Close: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
             }
+            System.out.println("[closed connection]");
             this.interrupt();
+
         }
 
         public synchronized void sendMessageToConnection(Message message) {
@@ -262,7 +258,7 @@ public class Node {
             } catch (IOException e) {
                 System.err.println("Send Message to Connection: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
             }
-            System.out.println("[sent message: " + message + "]");
+            System.out.println("[sent: " + message + "]");
         }
 
         synchronized private void handleFileBlockRequestMessage(FileBlockRequestMessage input) {
@@ -298,7 +294,6 @@ public class Node {
             nodeConnectionThreads.add(this);
             searchInfo.add(new FileInfo(input.getFileName(), input.getHash(), input.getFileSize(), nodeConnectionThreads));
             SwingUtilities.invokeLater(() -> gui.addToFileList(input.getFileName()));
-            System.out.println("Completed search query: " + input.getWordSearchMessage());
         }
 
         synchronized private void handleWordSearchMessage(WordSearchMessage input) {
@@ -306,7 +301,7 @@ public class Node {
                 String fileName = file.getFileName();
                 int index = fileName.indexOf(input.getKeyword());
                 if (index != -1) {
-                    FileSearchResult message = new FileSearchResult(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress(), input, file.getHash(), file.getFile().getTotalSpace(), fileName);
+                    FileSearchResult message = new FileSearchResult(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress(), input, file.getHash(), file.getSize(), fileName);
                     sendMessageToConnection(message);
                 }
             }

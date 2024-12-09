@@ -6,11 +6,11 @@ import java.net.InetAddress;
 public class FileSearchResult extends Message  implements Serializable {
     private final WordSearchMessage wordSearchMessage;
     private final String hash;
-    private final long fileSize;
+    private final int fileSize;
     private final String fileName;
 
 
-    public FileSearchResult(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress, WordSearchMessage wordSearchMessage, String hash, long fileSize, String fileName) {
+    public FileSearchResult(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress, WordSearchMessage wordSearchMessage, String hash, int fileSize, String fileName) {
         super(senderPort, senderAddress, receiverPort, receiverAddress);
         this.wordSearchMessage = wordSearchMessage;
         this.hash = hash;
@@ -26,7 +26,7 @@ public class FileSearchResult extends Message  implements Serializable {
         return hash;
     }
 
-    public long getFileSize() {
+    public int getFileSize() {
         return fileSize;
     }
 
