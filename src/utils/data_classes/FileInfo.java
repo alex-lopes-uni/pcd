@@ -1,4 +1,4 @@
-package utils;
+package utils.data_classes;
 
 import app.Node;
 

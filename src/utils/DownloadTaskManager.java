@@ -1,7 +1,7 @@
-package app;
+package utils;
 
-import utils.Constants;
-import utils.FileInfo;
+import app.Node;
+import utils.data_classes.FileInfo;
 import utils.messages.*;
 import java.io.IOException;
 import java.net.InetAddress;

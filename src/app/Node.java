@@ -1,8 +1,9 @@
 package app;
 
+import utils.DownloadTaskManager;
 import utils.messages.*;
-import utils.FileInfo;
-import utils.RepositoryFile;
+import utils.data_classes.FileInfo;
+import utils.data_classes.RepositoryFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
