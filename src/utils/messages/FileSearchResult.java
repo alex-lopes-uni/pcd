@@ -22,6 +22,10 @@ public class FileSearchResult extends Message  implements Serializable {
         return hash;
     }
 
+    public WordSearchMessage getWordSearchMessage() {
+        return wordSearchMessage;
+    }
+
     public int getFileSize() {
         return fileSize;
     }

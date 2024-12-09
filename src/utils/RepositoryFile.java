@@ -60,7 +60,7 @@ public class RepositoryFile {
         try {
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            System.err.println("Get File Binary: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
+            System.err.println(this.getClass() + ": [" + "getFileBinary()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
             return null;
         }
     }

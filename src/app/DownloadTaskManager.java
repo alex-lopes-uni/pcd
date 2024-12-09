@@ -82,7 +82,7 @@ public class DownloadTaskManager extends Thread {
             try {
                 thread.join();
             } catch (InterruptedException e) {
-                System.err.println("Make requests: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
+                System.err.println(this.getClass() + ": [" + "makeRequests()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
             }
         }
 
@@ -101,7 +101,7 @@ public class DownloadTaskManager extends Thread {
         try {
             Files.write(Paths.get(PATH), fileBytes);
         } catch (IOException e) {
-            System.err.println("Write file in directory: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
+            System.err.println(this.getClass() + ": [" + "writeFileInDirectory()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
         }
 
     }
@@ -115,10 +115,6 @@ public class DownloadTaskManager extends Thread {
 
         @Override
         public void run() {
-            processMessages();
-        }
-
-        protected void processMessages() {
             while (!requestBlocks.isEmpty()) {
                 try {
                     FileBlockRequestMessage request =  getBlockRequest(nodeConnectionThread.getConnection().getLocalPort(), nodeConnectionThread.getConnection().getLocalAddress(), nodeConnectionThread.getConnection().getPort(), nodeConnectionThread.getConnection().getLocalAddress());
@@ -126,14 +122,14 @@ public class DownloadTaskManager extends Thread {
 
                     FileBlockAnswerMessage answer = (FileBlockAnswerMessage) nodeConnectionThread.getIn().readObject();
                     if (answer == null) {
-                        System.err.println("An error occurred: FileBlockAnswerMessage is null" );
+                        System.err.println(this.getClass() + ": [" + "run()" + ": (error: " + "FileBlockAnswerMessage is null" + ")]");
                         return;
                     }
 
                     answerBlocks.add(answer);
 
                 } catch (ClassNotFoundException | IOException e) {
-                    System.err.println("Download Thread Process Messages: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
+                    System.err.println(this.getClass() + ": [" + "run()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
                     break;
                 }
             }
