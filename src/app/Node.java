@@ -127,6 +127,15 @@ public class Node {
 
     }
 
+    public void closeAllConnections() {
+        for (NodeConnectionThread thread : threads) {
+            if (thread.isAlive()) {
+                thread.closeConnection();
+                thread.interrupt();
+            }
+        }
+    }
+
     public void search(String keyword) {
         searchInfo.clear();
         for (NodeConnectionThread thread : threads) {
@@ -136,7 +145,6 @@ public class Node {
 
     }
 
-    // TODO DOWNLOAD FUNCTION
     public void download(String fileName) {
         FileInfo fileInfo = searchInfo.stream().filter(file -> file.fileName().equals(fileName)).findFirst().orElse(null);
 
@@ -193,36 +201,20 @@ public class Node {
                             System.out.println("[received message: " + message + "]");
                             close();
                             System.out.println("[closed connection]");
-                            break;
+                            return;
                         default:
                     }
                 } catch (ClassNotFoundException | IOException e) {
+                    if (connection.isClosed()) {
+                        return;
+                    }
                     System.err.println("Node Thread Connection Process Messages: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
-                    break;
+                    closeConnection();
+                    return;
                 }
             }
         }
 
-        @Override
-        protected void close() {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-                if (out != null) {
-                    out.close();
-                }
-                synchronized (threads) {
-                    threads.remove(this);
-                }
-                connection.close();
-
-            } catch (IOException e) {
-                System.err.println("Node Thread Connection Close: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
-            }
-        }
-
-        // TODO
         synchronized private void handleFileBlockRequestMessage(FileBlockRequestMessage input) {
             RepositoryFile file = repositoryFiles.stream().filter(f -> f.getHash().equals(input.getHash())).findFirst().orElse(null);
             FileBlockAnswerMessage response;

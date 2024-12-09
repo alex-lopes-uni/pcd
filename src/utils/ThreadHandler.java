@@ -18,12 +18,8 @@ public abstract class ThreadHandler extends Thread {
 
     @Override
     public void run() {
-        try {
-            getStreams();
-            processMessages();
-        } finally {
-            closeConnection();
-        }
+        getStreams();
+        processMessages();
     }
 
     private void getStreams() {
@@ -52,7 +48,7 @@ public abstract class ThreadHandler extends Thread {
         System.out.println("[sent message: " + message + "]");
     }
 
-    private void closeConnection() {
+    public void closeConnection() {
         CloseConnectionRequest message = new CloseConnectionRequest(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress());
         sendMessageToConnection(message);
         close();
@@ -60,17 +56,14 @@ public abstract class ThreadHandler extends Thread {
 
     protected void close() {
         try {
-            if (in != null) {
-                in.close();
-            }
-            if (out != null) {
-                out.close();
-            }
-            connection.close();
+            if (in != null) in.close();
+            if (out != null) out.close();
+            if (connection != null && !connection.isClosed()) connection.close();
 
         } catch (IOException e) {
             System.err.println("Close: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
         }
+        this.interrupt();
     }
 
     public Socket getConnection() {

@@ -2,6 +2,8 @@ package app;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,14 @@ public class GUI {
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setResizable(true);
+        mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        mainFrame.addWindowListener( new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                node.closeAllConnections();
+                System.exit(0);
+            }
+        });
 
         // create panels
         JPanel searchPanel = new JPanel(new GridLayout(1, 3));
@@ -63,8 +73,6 @@ public class GUI {
         buttonsPanel.add(downloadButton);
         buttonsPanel.add(connectionButton);
         mainFrame.add(new JScrollPane(fileList), BorderLayout.CENTER);
-
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     // creates the frame that makes the connection to other nodes
