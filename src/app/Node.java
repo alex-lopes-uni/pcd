@@ -306,7 +306,7 @@ public class Node {
                 String fileName = file.getFileName();
                 int index = fileName.indexOf(input.getKeyword());
                 if (index != -1) {
-                    FileSearchResult message = new FileSearchResult(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress(), input, file.getHash(), (int) file.getFile().getTotalSpace(), fileName);
+                    FileSearchResult message = new FileSearchResult(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress(), input, file.getHash(), file.getFile().getTotalSpace(), fileName);
                     sendMessageToConnection(message);
                 }
             }
