@@ -3,6 +3,7 @@ package utils.messages;
 import java.io.Serializable;
 import java.net.InetAddress;
 
+// message type to close the connection on the other side
 public class CloseConnectionRequest extends Message implements Serializable {
 
     public CloseConnectionRequest(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress) {

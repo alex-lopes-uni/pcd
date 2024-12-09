@@ -168,6 +168,7 @@ public class GUI {
         connectionFrame.dispose();
     }
 
+    // shows the download info after the download is completed
     public void showDownloadInfo(String fileName, long time, List<String> downloadInfo) {
 
         if (downloadInfo == null || downloadInfo.isEmpty()) {

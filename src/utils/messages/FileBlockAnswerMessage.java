@@ -13,10 +13,6 @@ public class FileBlockAnswerMessage extends Message implements Serializable {
         this.data = data;
     }
 
-    public String getHash() {
-        return hash;
-    }
-
     public byte[] getData() {
         return data;
     }

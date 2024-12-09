@@ -2,14 +2,13 @@ package app;
 
 import utils.Constants;
 import utils.FileInfo;
-import utils.ThreadHandler;
 import utils.messages.*;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DownloadTaskManager extends Thread {
@@ -61,11 +60,21 @@ public class DownloadTaskManager extends Thread {
         return downloadInfo;
     }
 
+    @Override
+    public void run() {
+        try {
+            makeRequests();
+        } finally {
+            writeFileInDirectory();
+        }
+
+    }
+
     public void makeRequests() {
         List<Thread> threads = new ArrayList<>();
 
-        for (Socket connection : fileInfo.connections()) {
-            DownloadThread handler = new DownloadThread(connection);
+        for (Node.NodeConnectionThread nodeConnectionThread : fileInfo.nodeConnectionThreads()) {
+            DownloadThread handler = new DownloadThread(nodeConnectionThread);
             threads.add(handler);
             handler.start();
         }
@@ -90,7 +99,6 @@ public class DownloadTaskManager extends Thread {
             addDownloadInfo(block.getSenderAddress().toString(), block.getSenderPort(), block.getData().length);
             offset += block.getData().length;
         }
-
         try {
             Files.write(Paths.get(PATH), fileBytes);
         } catch (IOException e) {
@@ -99,30 +107,25 @@ public class DownloadTaskManager extends Thread {
 
     }
 
-    @Override
-    public void run() {
-        try {
-            makeRequests();
-        } finally {
-            writeFileInDirectory();
-        }
+    private class DownloadThread extends Thread {
+        private final Node.NodeConnectionThread nodeConnectionThread;
 
-    }
-
-    private class DownloadThread extends ThreadHandler {
-
-        public DownloadThread(Socket connection) {
-            super(connection);
+        public DownloadThread(Node.NodeConnectionThread nodeConnectionThread) {
+            this.nodeConnectionThread = nodeConnectionThread;
         }
 
         @Override
+        public void run() {
+            processMessages();
+        }
+
         protected void processMessages() {
             while (!requestBlocks.isEmpty()) {
                 try {
-                    FileBlockRequestMessage request =  getBlockRequest(getConnection().getLocalPort(), getConnection().getLocalAddress(), getConnection().getPort(), getConnection().getLocalAddress());
-                    sendMessageToConnection(request);
+                    FileBlockRequestMessage request =  getBlockRequest(nodeConnectionThread.getConnection().getLocalPort(), nodeConnectionThread.getConnection().getLocalAddress(), nodeConnectionThread.getConnection().getPort(), nodeConnectionThread.getConnection().getLocalAddress());
+                    nodeConnectionThread.sendMessageToConnection(request);
 
-                    FileBlockAnswerMessage answer = (FileBlockAnswerMessage) in.readObject();
+                    FileBlockAnswerMessage answer = (FileBlockAnswerMessage) nodeConnectionThread.getIn().readObject();
                     if (answer == null) {
                         System.out.println("An error occurred while reading the answer from the server" );
                         return;
