@@ -47,7 +47,7 @@ public class RepositoryFile {
             }
             return result.toString();
         } catch (IOException | NoSuchAlgorithmException e) {
-            System.err.println("An error occurred: " + e.getMessage());
+            System.err.println("Set Hash: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
         }
         return null;
     }

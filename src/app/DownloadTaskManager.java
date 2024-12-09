@@ -94,7 +94,7 @@ public class DownloadTaskManager extends Thread {
         try {
             Files.write(Paths.get(PATH), fileBytes);
         } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
+            System.err.println("Write file in directory: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
         }
 
     }
@@ -131,7 +131,7 @@ public class DownloadTaskManager extends Thread {
                     answerBlocks.add(answer);
 
                 } catch (ClassNotFoundException | IOException e) {
-                    System.err.println("An error occurred: " + e.getMessage());
+                    System.err.println("Download Thread Process Messages: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
                     break;
                 }
             }

@@ -71,7 +71,7 @@ public class Node {
             System.out.println("node created in port: " + PORT);
             waitForConnections();
         } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
+            System.err.println("Run Server: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
         } finally {
             stopServer();
         }
@@ -88,7 +88,7 @@ public class Node {
                 threads.get(threads.indexOf(handler)).start();
                 System.out.println("Connection to " + connection.getInetAddress().getHostName() + ":" + connection.getPort() + " is established!");
             } catch (IOException e) {
-                System.err.println("An error occurred: " + e.getMessage());
+                System.err.println("Wait for connections: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
             }
 
         }
@@ -105,7 +105,7 @@ public class Node {
             if (ss != null)
                 ss.close();
         } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
+            System.err.println("Stop server: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
         }
         System.out.println("Server stopped");
     }
@@ -121,7 +121,7 @@ public class Node {
             System.out.println("Connection to " + connectionAddress + ":" + connectionPort + " is established!");
             return "success";
         } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
+            System.err.println("Connect to node: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
             return e.getMessage();
         }
 
@@ -152,7 +152,7 @@ public class Node {
         try {
             downloadTaskManager.join();
         } catch (InterruptedException e) {
-            System.err.println("An error occurred: " + e.getMessage());
+            System.err.println("Download " + fileName + ": [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
         }
 
         long endTime = System.currentTimeMillis();
@@ -193,12 +193,11 @@ public class Node {
                             System.out.println("[received message: " + message + "]");
                             close();
                             System.out.println("[closed connection]");
-                        case null:
-                        default:
                             break;
+                        default:
                     }
                 } catch (ClassNotFoundException | IOException e) {
-                    System.err.println("An error occurred: " + e.getMessage());
+                    System.err.println("Node Thread Connection Process Messages: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
                     break;
                 }
             }
@@ -219,7 +218,7 @@ public class Node {
                 connection.close();
 
             } catch (IOException e) {
-                System.err.println("An error occurred: " + e.getMessage());
+                System.err.println("Node Thread Connection Close: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
             }
         }
 
@@ -239,7 +238,7 @@ public class Node {
                 out.writeObject(response);
                 out.flush();
             } catch (IOException e) {
-                System.err.println("An error occurred: " + e.getMessage());
+                System.err.println("Handle File Block Request Message: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
             }
 
         }

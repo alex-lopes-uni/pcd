@@ -34,7 +34,7 @@ public abstract class ThreadHandler extends Thread {
             in = new ObjectInputStream(connection.getInputStream());
             System.out.println("Streams are ready!");
         } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
+            System.err.println("Get Streams: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
         }
     }
 
@@ -47,7 +47,7 @@ public abstract class ThreadHandler extends Thread {
             out.writeObject(message);
             out.flush();
         } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
+            System.err.println("Send Message to Connection: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
         }
         System.out.println("[sent message: " + message + "]");
     }
@@ -69,7 +69,7 @@ public abstract class ThreadHandler extends Thread {
             connection.close();
 
         } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
+            System.err.println("Close: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
         }
     }
 
