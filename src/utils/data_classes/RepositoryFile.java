@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-// data class to store a file and it's hash together
+// Data class to store a file together with the necessary functions to hash it and turn it into binary code
 public class RepositoryFile {
     private final File file;
     private final String hash;
@@ -19,17 +19,21 @@ public class RepositoryFile {
         this.size = getFileBinary().length;
     }
 
-    //file calculating algorithm
+    // Method to calculate the SHA-256 hash of the file
     public String setHash() {
         try {
+            // Create a SHA-256 MessageDigest instance
             MessageDigest md = MessageDigest.getInstance("SHA-256");
+            // Open file for reading
             try (FileInputStream stream = new FileInputStream(file)) {
                 byte[] array = new byte[1024];
                 int bytesRead;
+                // Read the file in chunks and update the digest
                 while ((bytesRead = stream.read(array)) != -1) {
                     md.update(array, 0, bytesRead);
                 }
             }
+            // Get the final hash value
             byte[] hash = md.digest();
 
             StringBuilder result = new StringBuilder();
@@ -40,22 +44,26 @@ public class RepositoryFile {
                 }
                 result.append(byteHex);
             }
+            // Return the hex string as the hash
             return result.toString();
         } catch (IOException | NoSuchAlgorithmException e) {
             System.err.println("Set Hash: [exception: " + e.getClass().getName() + ", error: " + e.getMessage() + "]");
+            return null;
         }
-        return null;
     }
 
-    // returns a block from the array
+    // Returns a block from the array
     public byte[] getFileBlock(int offset, int length) {
+        // Get the full file's binary data
         byte[] array = getFileBinary();
+        // Create a byte array to store the block
         byte[] res = new byte[length];
+        // Copy the block from the full binary data
         if (length - offset >= 0) System.arraycopy(array, offset, res, 0, length - offset);
         return res;
     }
 
-    // creates the full binary array to separate into blocks by function above to send
+    // Creates the full binary array to separate into blocks by function above to send
     public byte[] getFileBinary() {
         try {
             return Files.readAllBytes(file.toPath());
@@ -65,15 +73,17 @@ public class RepositoryFile {
         }
     }
 
+    // Method to get the size of the file in byte
     public int getSize() {
         return this.size;
     }
 
+    // Method to get the hash of the file
     public String getHash() {
         return this.hash;
     }
 
-    // to display file name in GUI
+    // Method to get the file's name (for GUI display)
     public String getFileName() {
         return this.file.getName();
     }

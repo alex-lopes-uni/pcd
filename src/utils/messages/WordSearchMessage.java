@@ -3,6 +3,7 @@ package utils.messages;
 import java.io.Serializable;
 import java.net.InetAddress;
 
+// class WordSearchMessage with keyword
 public class WordSearchMessage extends Message implements Serializable {
     private final String keyword;
 

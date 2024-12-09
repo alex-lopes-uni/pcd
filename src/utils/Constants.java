@@ -1,7 +1,9 @@
 package utils;
 
 public class Constants {
+    // block size for download blocks
     public static final int BLOCK_SIZE = 10240;
+
     // strings for the app.GUI
     public static final String MAIN_WINDOW_TITLE = "IscTorrents";
     public static final String CONNECTION_WINDOW_TITLE = "Ligação";

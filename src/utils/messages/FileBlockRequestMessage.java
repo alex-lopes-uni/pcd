@@ -3,6 +3,7 @@ package utils.messages;
 import java.io.Serializable;
 import java.net.InetAddress;
 
+// class FileBlockRequestMessage with the hash, the offset and the length of the block to get
 public class FileBlockRequestMessage extends Message implements Serializable {
     private final String hash;
     private final int offset;

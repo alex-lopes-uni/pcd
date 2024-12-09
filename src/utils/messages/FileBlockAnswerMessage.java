@@ -3,6 +3,7 @@ package utils.messages;
 import java.io.Serializable;
 import java.net.InetAddress;
 
+// class FileBlockRequestMessage with the hash and the binary data of the block to send
 public class FileBlockAnswerMessage extends Message implements Serializable {
     private final String hash;
     private final byte[] data;

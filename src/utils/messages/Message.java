@@ -3,7 +3,7 @@ package utils.messages;
 import java.io.Serializable;
 import java.net.InetAddress;
 
-// abstract class to make sure all message data classes have the sender and receiver
+// An abstract class to make sure all message data classes have the sender and receiver
 public abstract class Message  implements Serializable {
     private int senderPort;
     private InetAddress senderAddress;

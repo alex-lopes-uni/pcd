@@ -3,6 +3,7 @@ package utils.messages;
 import java.io.Serializable;
 import java.net.InetAddress;
 
+// class FileSearchResult with the WordSearchMessage that originates it, the hash, file size and name
 public class FileSearchResult extends Message  implements Serializable {
     private final WordSearchMessage wordSearchMessage;
     private final String hash;
