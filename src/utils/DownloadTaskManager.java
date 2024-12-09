@@ -95,46 +95,54 @@ public class DownloadTaskManager extends Thread {
 
         for (FileBlockAnswerMessage block : answerBlocks) {
             System.arraycopy(block.getData(), 0, fileBytes, offset, block.getData().length);
-            addDownloadInfo(block.getSenderAddress().toString(), block.getSenderPort(), block.getData().length);
             offset += block.getData().length;
         }
+
         try {
             Files.write(Paths.get(PATH), fileBytes);
         } catch (IOException e) {
             System.err.println(this.getClass() + ": [" + "writeFileInDirectory()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
+            downloadInfo.clear();
         }
 
     }
 
-    private class DownloadThread extends Thread {
+    public class DownloadThread extends Thread {
         private final Node.NodeConnectionThread nodeConnectionThread;
+        private final Object lock = new Object();
+        private long time;
 
         public DownloadThread(Node.NodeConnectionThread nodeConnectionThread) {
             this.nodeConnectionThread = nodeConnectionThread;
+            this.nodeConnectionThread.addDownloadThread(this);
         }
 
         @Override
         public void run() {
-            while (!requestBlocks.isEmpty()) {
-                try {
-                    FileBlockRequestMessage request =  getBlockRequest(nodeConnectionThread.getConnection().getLocalPort(), nodeConnectionThread.getConnection().getLocalAddress(), nodeConnectionThread.getConnection().getPort(), nodeConnectionThread.getConnection().getLocalAddress());
-                    nodeConnectionThread.sendMessageToConnection(request);
-
-                    FileBlockAnswerMessage answer = (FileBlockAnswerMessage) nodeConnectionThread.getIn().readObject();
-                    if (answer == null) {
-                        System.err.println(this.getClass() + ": [" + "run()" + ": (error: " + "FileBlockAnswerMessage is null" + ")]");
-                        return;
+            synchronized (lock) {
+                while (!requestBlocks.isEmpty()) {
+                    try {
+                        FileBlockRequestMessage request =  getBlockRequest(nodeConnectionThread.getConnection().getLocalPort(), nodeConnectionThread.getConnection().getLocalAddress(), nodeConnectionThread.getConnection().getPort(), nodeConnectionThread.getConnection().getLocalAddress());
+                        nodeConnectionThread.sendMessageToConnection(request);
+                        time = System.currentTimeMillis();
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        System.err.println(this.getClass() + ": [" + "run()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
+                        break;
                     }
-
-                    answerBlocks.add(answer);
-
-                } catch (ClassNotFoundException | IOException e) {
-                    System.err.println(this.getClass() + ": [" + "run()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
-                    break;
-                }
+              }
             }
         }
 
+        public void messageAnswer(FileBlockAnswerMessage answer) {
+            synchronized (lock) {
+                long end = System.currentTimeMillis();
+                long diff = end - time;
+                answerBlocks.add(answer);
+                addDownloadInfo(answer.getSenderAddress().toString(), answer.getSenderPort(), diff);
+                lock.notify();
+            }
+        }
 
     }
 

@@ -179,9 +179,18 @@ public class Node {
         private ObjectInputStream in;
         private ObjectOutputStream out;
         private final Socket connection;
+        private DownloadTaskManager.DownloadThread downloadThread;
 
         public NodeConnectionThread(Socket connection) {
             this.connection = connection;
+        }
+
+        public void addDownloadThread(DownloadTaskManager.DownloadThread downloadThread) {
+            this.downloadThread = downloadThread;
+        }
+
+        public Socket getConnection() {
+            return connection;
         }
 
         @Override
@@ -198,37 +207,6 @@ public class Node {
                 System.out.println("[streams successfully created]");
             } catch (IOException e) {
                 System.err.println(this.getClass() + ": [" + "getStreams()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
-            }
-        }
-
-        private void processMessages() {
-            while (true) {
-                try {
-                    Object object = in.readObject();
-                    System.out.println("[received: " + object + "]");
-                    switch (object) {
-                        case FileBlockRequestMessage message:
-                            handleFileBlockRequestMessage(message);
-                            break;
-                        case FileSearchResult message:
-                            handleFileSearchResult(message);
-                            break;
-                        case WordSearchMessage message:
-                            handleWordSearchMessage(message);
-                            break;
-                        case CloseConnectionRequest _:
-                            close();
-                            return;
-                        default:
-                    }
-                } catch (ClassNotFoundException | IOException e) {
-                    if (connection.isClosed()) {
-                        return;
-                    }
-                    System.err.println(this.getClass() + ": [" + "processMessages()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
-                    closeConnection();
-                    return;
-                }
             }
         }
 
@@ -261,6 +239,48 @@ public class Node {
                 System.err.println(this.getClass() + ": [" + "sendMessageToConnection()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
             }
             System.out.println("[sent: " + message + "]");
+        }
+
+        private void processMessages() {
+            while (true) {
+                try {
+                    Object object = in.readObject();
+                    System.out.println("[received: " + object + "]");
+                    switch (object) {
+                        case FileBlockAnswerMessage message:
+                            handleFileBlockAnswerMessage(message);
+                            break;
+                        case FileBlockRequestMessage message:
+                            handleFileBlockRequestMessage(message);
+                            break;
+                        case FileSearchResult message:
+                            handleFileSearchResult(message);
+                            break;
+                        case WordSearchMessage message:
+                            handleWordSearchMessage(message);
+                            break;
+                        case CloseConnectionRequest _:
+                            close();
+                            return;
+                        default:
+                    }
+                } catch (ClassNotFoundException | IOException e) {
+                    if (connection.isClosed()) {
+                        return;
+                    }
+                    System.err.println(this.getClass() + ": [" + "processMessages()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
+                    closeConnection();
+                    return;
+                }
+            }
+        }
+
+        private void handleFileBlockAnswerMessage(FileBlockAnswerMessage message) {
+            if(downloadThread == null) {
+                System.err.println(this.getClass() + ": [" + "download()" + ": (error: " + "There is no download thread" + ")]");
+                return;
+            }
+            downloadThread.messageAnswer(message);
         }
 
         synchronized private void handleFileBlockRequestMessage(FileBlockRequestMessage input) {
@@ -316,13 +336,6 @@ public class Node {
             sendMessageToConnection(message);
         }
 
-        public Socket getConnection() {
-            return connection;
-        }
-
-        public ObjectInputStream getIn() {
-            return in;
-        }
 
     }
 }
