@@ -62,7 +62,7 @@ public class Node {
         File[] temp = dir.listFiles();
         if (temp != null) {
             for (File file : temp) {
-                if (!file.isDirectory()) {
+                if (!file.isDirectory() && file.getName().endsWith(".mp3")) {
                     result.add(new RepositoryFile(file));
                 }
             }
@@ -102,7 +102,6 @@ public class Node {
                 }
                 // Start the handler thread
                 threads.get(threads.indexOf(handler)).start();
-                System.out.println("[connection established: " + connection.getInetAddress().getHostName() + ":" + connection.getPort() + "]");
             } catch (IOException e) {
                 System.err.println(this.getClass() + ": [" + "waitForConnections()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
             }
@@ -140,7 +139,6 @@ public class Node {
                 threads.add(handler);
             }
             threads.get(threads.indexOf(handler)).start();
-            System.out.println("[connection established: " + connectionAddress + ":" + connectionPort + "]");
             return "success"; // Return success if the connection is established so that the GUI knows the connection status
         } catch (IOException e) {
             System.err.println(this.getClass() + ": [" + "connectToNode()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
@@ -235,6 +233,9 @@ public class Node {
                 out.flush();
                 // Initialize the input stream for reading incoming messages
                 in = new ObjectInputStream(connection.getInputStream());
+                // Sends message to acknowledge the connection
+                NewConnectionRequest newConnectionRequest = new NewConnectionRequest(connection.getLocalPort(), connection.getLocalAddress(), connection.getPort(), connection.getInetAddress());
+                sendMessageToConnection(newConnectionRequest);
                 System.out.println("[streams successfully created]");
             } catch (IOException e) {
                 System.err.println(this.getClass() + ": [" + "getStreams()" + ": (exception: " + e.getClass().getName() + ", error: " + e.getMessage() + ")]");
@@ -294,6 +295,9 @@ public class Node {
                             break;
                         case WordSearchMessage message:
                             handleWordSearchMessage(message);
+                            break;
+                        case NewConnectionRequest _:
+                            System.out.println("[connection established: " + connection.getLocalAddress() + ":" + connection.getLocalPort() + "]");
                             break;
                         case CloseConnectionRequest _:
                             close();
