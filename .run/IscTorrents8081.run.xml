@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="IscTorrents8081" type="Application" factoryName="Application">
-        <option name="MAIN_CLASS_NAME" value="IscTorrents"/>
-        <module name="pcd"/>
-        <option name="PROGRAM_PARAMETERS" value="8081 rep1"/>
-        <method v="2">
-            <option name="Make" enabled="true"/>
-        </method>
-    </configuration>
+  <configuration default="false" name="IscTorrents8081" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="IscTorrents" />
+    <module name="pcd" />
+    <option name="PROGRAM_PARAMETERS" value="8081 dl1" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
 </component>

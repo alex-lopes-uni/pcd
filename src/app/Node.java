@@ -214,7 +214,7 @@ public class Node {
                         case WordSearchMessage message:
                             handleWordSearchMessage(message);
                             break;
-                        case CloseConnectionRequest message:
+                        case CloseConnectionRequest _:
                             close();
                             return;
                         default:

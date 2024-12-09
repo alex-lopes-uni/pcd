@@ -65,10 +65,6 @@ public class RepositoryFile {
         }
     }
 
-    public File getFile() {
-        return this.file;
-    }
-
     public int getSize() {
         return this.size;
     }
