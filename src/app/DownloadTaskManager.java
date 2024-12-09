@@ -29,7 +29,7 @@ public class DownloadTaskManager extends Thread {
     public void createFileRequestBlocks() {
         requestBlocks = new ArrayList<>();
 
-        for (int i = 0; i < this.fileInfo.fileSize(); i+= Constants.BLOCK_SIZE) {
+        for (long i = 0; i < this.fileInfo.fileSize(); i+= Constants.BLOCK_SIZE) {
             if (i + Constants.BLOCK_SIZE > this.fileInfo.fileSize()) {
                 int size = (int) (this.fileInfo.fileSize() - i);
                 addBlockRequest(i , size);
@@ -39,7 +39,7 @@ public class DownloadTaskManager extends Thread {
         }
     }
 
-    public void addBlockRequest(int offset, int size) {
+    public void addBlockRequest(long offset, int size) {
         FileBlockRequestMessage block = new FileBlockRequestMessage(0, null, 0, null, fileInfo.fileHash(), offset, size);
         requestBlocks.add(block);
     }

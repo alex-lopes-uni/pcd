@@ -5,10 +5,10 @@ import java.net.InetAddress;
 
 public class FileBlockRequestMessage extends Message implements Serializable {
     private final String hash;
-    private final int offset;
+    private final long offset;
     private final int length;
 
-    public FileBlockRequestMessage(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress, String hash, int offset, int length) {
+    public FileBlockRequestMessage(int senderPort, InetAddress senderAddress, int receiverPort, InetAddress receiverAddress, String hash, long offset, int length) {
         super(senderPort, senderAddress, receiverPort, receiverAddress);
         this.hash = hash;
         this.offset = offset;
@@ -19,7 +19,7 @@ public class FileBlockRequestMessage extends Message implements Serializable {
         return hash;
     }
 
-    public int getOffset() {
+    public long getOffset() {
         return offset;
     }
 
