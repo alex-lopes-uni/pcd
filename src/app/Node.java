@@ -296,10 +296,10 @@ public class Node {
                         case WordSearchMessage message:
                             handleWordSearchMessage(message);
                             break;
-                        case NewConnectionRequest _:
+                        case NewConnectionRequest message:
                             System.out.println("[connection established: " + connection.getLocalAddress() + ":" + connection.getLocalPort() + "]");
                             break;
-                        case CloseConnectionRequest _:
+                        case CloseConnectionRequest message:
                             close();
                             return;
                         default:

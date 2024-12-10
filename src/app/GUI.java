@@ -61,7 +61,7 @@ public class GUI {
         downloadButton.addActionListener(this::downloadButtonClicked);
 
         JButton connectionButton = new JButton(CONNECTION_BUTTON_TEXT);
-        connectionButton.addActionListener(_ -> createConnectionFrame());
+        connectionButton.addActionListener(e -> createConnectionFrame());
 
         // Create the list to display files
         listModel = new DefaultListModel<>();
@@ -93,7 +93,7 @@ public class GUI {
 
         // Buttons for canceling or confirming connection
         JButton cancelButton = new JButton(CANCEL_BUTTON_TEXT);
-        cancelButton.addActionListener(_ -> connectionFrame.dispose());
+        cancelButton.addActionListener(e -> connectionFrame.dispose());
 
         JButton okButton = new JButton(OK_BUTTON_TEXT);
         okButton.addActionListener(this::okButtonClicked);
